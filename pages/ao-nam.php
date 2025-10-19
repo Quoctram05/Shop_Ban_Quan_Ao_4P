@@ -37,31 +37,34 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/product1.jpg" alt="Áo Polo 1">
+          <img src="../assets/img/an1.jpg" alt="Áo Polo 1">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo PO170</h4>
           <p><span class="new">284,000₫</span> <span class="old">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/product2.jpg" alt="Áo Thun 1">
+          <img src="../assets/img/an2.jpg" alt="Áo Thun 1">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Thun AT158</h4>
+          <h4>
+Áo Thun Wash Loang In Chữ Hopeless Dream Form Regular AT172 Màu Xanh Đá</h4>
           <p><span class="new">275,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/product3.jpg" alt="Áo Sơ Mi 1">
+          <img src="../assets/img/an3.jpg" alt="Áo Sơ Mi 1">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Sơ Mi SM179</h4>
+          <h4>Áo Sơ Mi Tay Ngắn Oxford Thêu 4M Ở Túi Form Regular SM191 Màu Trắng</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/product4.jpg" alt="Áo Thun 2">
+          <img src="../assets/img/an4.jpg" alt="Áo Thun 2">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Thun AT177</h4>
+          <h4>
+-28%
+Áo Khoác Dù Trượt Nước Thêu 3D Logo 4M Form Regular AK075 Màu Kem</h4>
           <p><span class="new">221,000₫</span> <span class="old">245,000₫</span></p>
         </div>
         <!-- Bạn có thể thêm nhiều card hơn -->

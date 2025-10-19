@@ -39,28 +39,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/giay1.jpg" alt="GI021">
+          <img src="../assets/img/giay1.jpg" alt="GI021">
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Giày Derby GI021</h4>
           <p><span class="new">878,000₫</span> <span class="old">975,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/giay2.jpg" alt="GI020">
+          <img src="../assets/img/giay2.jpg" alt="GI020">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Giày Penny Loafer GI020</h4>
           <p><span class="new">851,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/giay3.jpg" alt="GI019">
+          <img src="../assets/img/giay3.jpg" alt="GI019">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Giày Oxford GI019</h4>
           <p><span class="new">790,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/giay4.jpg" alt="SND001">
+          <img src="../assets/img/giay4.jpg" alt="SND001">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Sandal Da SND001</h4>

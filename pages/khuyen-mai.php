@@ -29,7 +29,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm khuyến mãi -->
         <div class="product-card">
-          <img src="assets/img/product1.jpg" alt="Sản phẩm KM 1">
+          <img src="../assets/img/km1.jpg" alt="Sản phẩm KM 1">
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short QS080</h4>
@@ -37,7 +37,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/product2.jpg" alt="Sản phẩm KM 2">
+          <img src="../assets/img/km2.jpg" alt="Sản phẩm KM 2">
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short QS079</h4>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/product3.jpg" alt="Sản phẩm KM 3">
+          <img src="../assets/img/km3.jpg" alt="Sản phẩm KM 3">
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo PO170</h4>
@@ -53,7 +53,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/product4.jpg" alt="Sản phẩm KM 4">
+          <img src="../assets/img/km4.jpg" alt="Sản phẩm KM 4">
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo PO169</h4>

@@ -41,28 +41,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/thun1.jpg" alt="Áo Thun AT179">
+          <img src="../assets/img/aothun1.jpg" alt="Áo Thun AT179">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Ba Lỗ AT179</h4>
           <p><span class="new">195,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/thun2.jpg" alt="Áo Thun AT177">
+          <img src="../assets/img/aothun2.jpg" alt="Áo Thun AT177">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Thun phối vai AT177</h4>
           <p><span class="new">245,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/thun3.jpg" alt="Áo Thun AT176">
+          <img src="../assets/img/aothun3.jpg" alt="Áo Thun AT176">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Thun phối 2 màu AT176</h4>
           <p><span class="new">245,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/thun4.jpg" alt="Áo Thun AT174">
+          <img src="../assets/img/aothun4.jpg" alt="Áo Thun AT174">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Thun Wash Loang AT174</h4>

@@ -39,7 +39,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm trong collection Rayon -->
         <div class="product-card">
-          <img src="assets/img/rayon_PO164.jpg" alt="PO164" />
+          <img src="../assets/img/ro1.jpg" alt="PO164" />
           <div class="badge">-13%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo Rayon In Logo Tròn PO164</h4>
@@ -47,7 +47,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/rayon_PO163.jpg" alt="PO163" />
+          <img src="../assets/img/ro2.jpg" alt="PO163" />
           <div class="badge">-8%</div>
           <div like overlay><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo Rayon Rã Phối PO163</h4>
@@ -55,7 +55,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/rayon_PO162.jpg" alt="PO162" />
+          <img src="../assets/img/ro3.jpg" alt="PO162" />
           <div class="badge">-8%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo Rayon Nanh Sói PO162</h4>
@@ -63,7 +63,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/rayon_PO161.jpg" alt="PO161" />
+          <img src="../assets/img/ro4.jpg" alt="PO161" />
           <div class="badge">-8%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo Rayon Bo Sọc PO161</h4>

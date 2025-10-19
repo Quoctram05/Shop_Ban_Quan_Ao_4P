@@ -40,28 +40,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/jogger1.jpg" alt="JO016">
+          <img src="../assets/img/jg1.jpg" alt="JO016">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jogger Kaki JO016</h4>
           <p><span class="new">425,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/jogger2.jpg" alt="JO015">
+          <img src="../assets/img/jg2.jpg" alt="JO015">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jogger Kaki JO015</h4>
           <p><span class="new">425,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/jogger3.jpg" alt="JO013">
+          <img src="../assets/img/jg3.jpg" alt="JO013">
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jogger Túi Chéo JO013</h4>
           <p><span class="new">213,000₫</span> <span class="old">425,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/jogger4.jpg" alt="JO012">
+          <img src="../assets/img/jg4.jpg" alt="JO012">
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jogger Rã Chéo JO012</h4>

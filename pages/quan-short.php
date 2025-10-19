@@ -39,28 +39,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm short -->
         <div class="product-card">
-          <img src="assets/img/qs080.jpg" alt="QS080">
+          <img src="../assets/img/short1.jpg" alt="QS080">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short Thể Thao In Chữ QS080</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qs079.jpg" alt="QS079">
+          <img src="../assets/img/short2.jpg" alt="QS079">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short Thể Thao In Logo QS079</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qs074.jpg" alt="QS074">
+          <img src="../assets/img/short3.jpg" alt="QS074">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short Kaki Diễu QS074</h4>
           <p><span class="new">345,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qs076.jpg" alt="QS076">
+          <img src="../assets/img/short4.jpg" alt="QS076">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short Jean QS076</h4>

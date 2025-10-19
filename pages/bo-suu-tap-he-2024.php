@@ -37,7 +37,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ các sản phẩm của Hè 2024 -->
         <div class="product-card">
-          <img src="assets/img/he-2024/SM152.jpg" alt="SM152" />
+          <img src="../assets/img/he1.jpg" alt="SM152" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi Oxford SM152</h4>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/he-2024/TL165.jpg" alt="TL165" />
+          <img src="../assets/img/he2.jpg" alt="TL165" />
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Thắt lưng đầu kim TL165</h4>
@@ -53,7 +53,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/he-2024/DE005.jpg" alt="DE005" />
+          <img src="../assets/img/he3.jpg" alt="DE005" />
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Dép Sandal DE005</h4>
@@ -61,7 +61,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/he-2024/TL166.jpg" alt="TL166" />
+          <img src="../assets/img/he4.jpg" alt="TL166" />
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Thắt lưng TL166</h4>
@@ -69,7 +69,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/he-2024/QS055.jpg" alt="QS055" />
+          <img src="../assets/img/he5.jpg" alt="QS055" />
           <div class="badge">-30%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short QS055</h4>

@@ -38,7 +38,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm PO170 -->
         <div class="product-card">
-          <img src="assets/img/polo1.jpg" alt="PO170">
+          <img src="../assets/img/polo1.jpg" alt="PO170">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo Thể Thao Phối Viền PO170</h4>
@@ -46,21 +46,21 @@
         </div>
         <!-- Thêm các sản phẩm khác theo mẫu -->
         <div class="product-card">
-          <img src="assets/img/polo2.jpg" alt="PO169">
+          <img src="../assets/img/polo2.jpg" alt="PO169">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo Thể Thao PO169</h4>
           <p><span class="new">315,000₫</span> <span class="old">345,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/polo3.jpg" alt="PO168">
+          <img src="../assets/img/polo3.jpg" alt="PO168">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo PO168</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/polo4.jpg" alt="PO167">
+          <img src="../assets/img/polo4.jpg" alt="PO167">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo PO167</h4>

@@ -39,28 +39,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ các sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/qt069.jpg" alt="QT069">
+          <img src="../assets/img/tay1.jpg" alt="QT069">
           <div class="badge">-18%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Tây Sidetab Slimfit QT069</h4>
           <p><span class="new">349,000₫</span> <span class="old">425,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qt068.jpg" alt="QT068">
+          <img src="../assets/img/tay2.jpg" alt="QT068">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Tây Sidetab Regular QT068</h4>
           <p><span class="new">475,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qt067.jpg" alt="QT067">
+          <img src="../assets/img/tay3.jpg" alt="QT067">
           <div class="badge">-18%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Tây Sidetab Slimfit QT067</h4>
           <p><span class="new">349,000₫</span> <span class="old">425,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qt031.jpg" alt="QT031">
+          <img src="../assets/img/tay4.jpg" alt="QT031">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Tây Trơn Rayon QT031</h4>

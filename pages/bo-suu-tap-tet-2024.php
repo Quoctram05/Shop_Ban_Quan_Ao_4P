@@ -37,7 +37,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ các sản phẩm Tết 2024 -->
         <div class="product-card">
-          <img src="assets/img/tet2024/AT132.jpg" alt="AT132" />
+          <img src="../assets/img/tet1.jpg" alt="AT132" />
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Thun Cổ Tròn Trơn Form Slimfit AT132</h4>
@@ -45,7 +45,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/tet2024/AH004.jpg" alt="AH004" />
+          <img src="../assets/img/tet2.jpg" alt="AH004" />
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Hoodie Rã Phối Thêu AH004</h4>
@@ -53,7 +53,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/tet2024/SM143.jpg" alt="SM143" />
+          <img src="../assets/img/tet3.jpg" alt="SM143" />
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi Sọc Tay Dài SM143</h4>
@@ -61,7 +61,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/tet2024/QJ093.jpg" alt="QJ093" />
+          <img src="../assets/img/tet4.jpg" alt="QJ093" />
           <div class="badge">-30%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jeans Wash Xám QJ093</h4>
@@ -69,7 +69,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/tet2024/QJ091.jpg" alt="QJ091" />
+          <img src="../assets/img/tet5.jpg" alt="QJ091" />
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jeans Xanh Đậm QJ091</h4>
@@ -77,7 +77,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/tet2024/QJ090.jpg" alt="QJ090" />
+          <img src="../assets/img/tet6.jpg" alt="QJ090" />
           <div class="badge">-</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jeans Xanh Nhạt Thêu 4MEN QJ090</h4>

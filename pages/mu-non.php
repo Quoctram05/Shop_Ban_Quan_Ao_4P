@@ -39,7 +39,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/mu1.jpg" alt="MU010" />
+          <img src="../assets/img/mu1.jpg" alt="MU010" />
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Nón Lưỡi Trai Thêu MU010</h4>
@@ -49,7 +49,7 @@
           </p>
         </div>
         <div class="product-card">
-          <img src="assets/img/mu2.jpg" alt="MU009" />
+          <img src="../assets/img/mu2.jpg" alt="MU009" />
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Nón Lưỡi Trai Thêu MU009</h4>
@@ -59,7 +59,7 @@
           </p>
         </div>
         <div class="product-card">
-          <img src="assets/img/mu3.jpg" alt="MU008" />
+          <img src="../assets/img/mu3.jpg" alt="MU008" />
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Nón Thêu Mỏ Neo MU008</h4>
@@ -69,7 +69,7 @@
           </p>
         </div>
         <div class="product-card">
-          <img src="assets/img/mu4.jpg" alt="MU004" />
+          <img src="../assets/img/mu4.jpg" alt="MU004" />
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Nón LT Thêu Full Of Hope MU004</h4>

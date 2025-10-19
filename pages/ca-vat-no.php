@@ -39,28 +39,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/cavat1.jpg" alt="CV082">
+          <img src="../assets/img/cavat1.jpg" alt="CV082">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Cà Vạt Sọc CV082</h4>
           <p><span class="new">145,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/cavat2.jpg" alt="CV081">
+          <img src="../assets/img/cavat2.jpg" alt="CV081">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Cà Vạt Sọc CV081</h4>
           <p><span class="new">145,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/cavat3.jpg" alt="CV080">
+          <img src="../assets/img/cavat3.jpg" alt="CV080">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Cà Vạt Họa Tiết CV080</h4>
           <p><span class="new">145,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/no1.jpg" alt="NO020">
+          <img src="../assets/img/cavat4.jpg" alt="NO020">
           <div class="badge">-50%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Nơ Nam Sọc Caro NO020</h4>

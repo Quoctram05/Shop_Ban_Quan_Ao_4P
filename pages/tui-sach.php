@@ -39,14 +39,14 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ các sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/tx018.jpg" alt="TX018" />
+          <img src="../assets/img/tx1.jpg" alt="TX018" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Túi Xách Jean TX018</h4>
           <p><span class="new">175,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tx014.jpg" alt="TX014" />
+          <img src="../assets/img/tx2.jpg" alt="TX014" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Túi Bao Tử Casual TX014</h4>

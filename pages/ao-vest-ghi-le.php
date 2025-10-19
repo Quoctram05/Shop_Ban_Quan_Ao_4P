@@ -38,28 +38,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ 4 sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/vest1.jpg" alt="AV031">
+          <img src="../assets/img/vest1.jpg" alt="AV031">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Vest SLIMFIT AV031</h4>
           <p><span class="new">1,150,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/vest2.jpg" alt="AG001">
+          <img src="../assets/img/vest2.jpg" alt="AG001">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Ghi Lê Caro AG001</h4>
           <p><span class="new">375,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/vest3.jpg" alt="AV035">
+          <img src="../assets/img/vest3.jpg" alt="AV035">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Vest Túi Mổ AV035</h4>
           <p><span class="new">985,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/vest4.jpg" alt="AV034">
+          <img src="../assets/img/vest4.jpg" alt="AV034">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Vest Caro AV034</h4>

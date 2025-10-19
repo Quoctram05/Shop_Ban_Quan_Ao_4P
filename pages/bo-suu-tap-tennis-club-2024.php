@@ -37,42 +37,42 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm trong Tennis Club 2024 -->
         <div class="product-card">
-          <img src="assets/img/tennis/QK028.jpg" alt="QK028" />
+          <img src="../assets/img/tennis1.jpg" alt="QK028" />
           <div class="badge">-</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Kaki Trơn Signature QK028</h4>
           <p><span class="new">475,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tennis/PO133.jpg" alt="PO133" />
+          <img src="../assets/img/tennis2.jpg" alt="PO133" />
           <div class="badge">-</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Polo Phối Bo Thêu Ngực PO133</h4>
           <p><span class="new">375,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tennis/AK059.jpg" alt="AK059" />
+          <img src="../assets/img/tennis3.jpg" alt="AK059" />
           <div class="badge">-30%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Khoác Varsity AK059</h4>
           <p><span class="new">480,000₫</span> <span class="old">685,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tennis/QS057.jpg" alt="QS057" />
+          <img src="../assets/img/tennis4.jpg" alt="QS057" />
           <div class="badge">-</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short QS057</h4>
           <p><span class="new">375,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tennis/AT151.jpg" alt="AT151" />
+          <img src="../assets/img/tennis5.jpg" alt="AT151" />
           <div class="badge">-30%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Thun Wash In Graphic AT151</h4>
           <p><span class="new">207,000₫</span> <span class="old">295,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tennis/MU010.jpg" alt="MU010" />
+          <img src="../assets/img/tennis6.jpg" alt="MU010" />
           <div class="badge">-</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Nón Lưỡi Trai MU010</h4>

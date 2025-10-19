@@ -38,28 +38,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/hoodie1.jpg" alt="AH007">
+          <img src="../assets/img/hoodie1.jpg" alt="AH007">
           <div class="badge">-22%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Hoodie Thêu Logo AH007</h4>
           <p><span class="new">595,000₫</span> <span class="old">760,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/hoodie2.jpg" alt="AH006">
+          <img src="../assets/img/hoodie2.jpg" alt="AH006">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Hoodie Khóa Zip Phối Dây AH006</h4>
           <p><span class="new">445,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/hoodie3.jpg" alt="AH008">
+          <img src="../assets/img/hoodie3.jpg" alt="AH008">
           <div class="badge">-22%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Hoodie Rã Phối Viền AH008</h4>
           <p><span class="new">595,000₫</span> <span class="old">760,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/hoodie4.jpg" alt="AS004">
+          <img src="../assets/img/hoodie4.jpg" alt="AS004">
           <div class="badge">-70%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Sweatshirt Thêu 4MEN AS004</h4>

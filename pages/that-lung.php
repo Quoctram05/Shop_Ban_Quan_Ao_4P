@@ -41,28 +41,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/tl195.jpg" alt="TL195">
+          <img src="../assets/img/tl1.jpg" alt="TL195">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Thắt Lưng Khóa Tự Động TL195</h4>
           <p><span class="new">275,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tl194.jpg" alt="TL194">
+          <img src="../assets/img/tl2.jpg" alt="TL194">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Thắt Lưng Khóa Tự Động TL194</h4>
           <p><span class="new">245,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tl193.jpg" alt="TL193">
+          <img src="../assets/img/tl3.jpg" alt="TL193">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Thắt Lưng Khóa Tự Động TL193</h4>
           <p><span class="new">275,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/tl192.jpg" alt="TL192">
+          <img src="../assets/img/tl4.jpg" alt="TL192">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Thắt Lưng Khóa Tự Động TL192</h4>

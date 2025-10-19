@@ -40,28 +40,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm ví da -->
         <div class="product-card">
-          <img src="assets/img/vd1.jpg" alt="BV060" />
+          <img src="../assets/img/vd1.jpg" alt="BV060" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Ví Da Epsom Mini Dáng Ngang BV060</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/vd2.jpg" alt="BV059" />
+          <img src="../assets/img/vd2.jpg" alt="BV059" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Ví Da Saffiano Khóa Kéo Đứng BV059</h4>
           <p><span class="new">345,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/vd3.jpg" alt="BV058" />
+          <img src="../assets/img/vd3.jpg" alt="BV058" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Ví Da Saffiano Mini Đứng BV058</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/vd4.jpg" alt="BV057" />
+          <img src="../assets/img/vd4.jpg" alt="BV057" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Ví Da Nappa Có Khóa Dáng Ngang BV057</h4>

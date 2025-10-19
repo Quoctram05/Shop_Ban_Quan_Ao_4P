@@ -39,14 +39,14 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ các sản phẩm Wrinkle-X -->
         <div class="product-card">
-          <img src="assets/img/wx_sm181.jpg" alt="SM181" />
+          <img src="../assets/img/wx1.jpg" alt="SM181" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi SM181 – Wrinkle-X</h4>
           <p><span class="new">475,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/wx_sm176.jpg" alt="SM176" />
+          <img src="../assets/img/wx2.jpg" alt="SM176" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi SM176 – Wrinkle-X</h4>

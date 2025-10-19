@@ -41,28 +41,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ các sản phẩm kaki -->
         <div class="product-card">
-          <img src="assets/img/qk031.jpg" alt="QK031">
+          <img src="../assets/img/kaki1.jpg" alt="QK031">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Kaki Diễu 2 Bên Miệng Túi Slimfit QK031</h4>
           <p><span class="new">425,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qk028.jpg" alt="QK028">
+          <img src="../assets/img/kaki2.jpg" alt="QK028">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Kaki Trơn Signature QK028</h4>
           <p><span class="new">475,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qk030.jpg" alt="QK030">
+          <img src="../assets/img/kaki3.jpg" alt="QK030">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Kaki Thêu Logo 4M Premium QK030</h4>
           <p><span class="new">395,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/qk023.jpg" alt="QK023">
+          <img src="../assets/img/kaki4.jpg" alt="QK023">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Kaki Nhung Tăm Lưng Thun Slim-Cropped QK023</h4>

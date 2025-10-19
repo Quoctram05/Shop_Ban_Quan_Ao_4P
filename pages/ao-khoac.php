@@ -41,28 +41,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/khoac1.jpg" alt="Khoác Dù AK075">
+          <img src="../assets/img/khoac1.jpg" alt="Khoác Dù AK075">
           <div class="badge">-28%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Khoác Dù AK075</h4>
           <p><span class="new">319,000₫</span> <span class="old">445,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/khoac2.jpg" alt="Khoác Bomber AK064">
+          <img src="../assets/img/khoac2.jpg" alt="Khoác Bomber AK064">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Khoác Bomber AK064</h4>
           <p><span class="new">645,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/khoac3.jpg" alt="Khoác Kaki AK062">
+          <img src="../assets/img/khoac3.jpg" alt="Khoác Kaki AK062">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Khoác Kaki AK062</h4>
           <p><span class="new">585,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/khoac4.jpg" alt="Khoác Varsity AK059">
+          <img src="../assets/img/khoac4.jpg" alt="Khoác Varsity AK059">
           <div class="badge">-20%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Khoác Varsity AK059</h4>

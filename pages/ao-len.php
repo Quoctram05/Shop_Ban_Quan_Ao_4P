@@ -39,7 +39,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ 4 sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/len1.jpg" alt="AL014">
+          <img src="../assets/img/len1.jpg" alt="AL014">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Len Tay Dài AL014</h4>
@@ -47,7 +47,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/len2.jpg" alt="AL012">
+          <img src="../assets/img/len2.jpg" alt="AL012">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Len Họa Tiết AL012</h4>
@@ -55,7 +55,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/len3.jpg" alt="AL013">
+          <img src="../assets/img/len3.jpg" alt="AL013">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Len Cổ V AL013</h4>
@@ -63,7 +63,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/len4.jpg" alt="AL011">
+          <img src="../assets/img/len4.jpg" alt="AL011">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Len AL011</h4>

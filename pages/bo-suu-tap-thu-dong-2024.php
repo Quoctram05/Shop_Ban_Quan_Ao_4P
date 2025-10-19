@@ -38,7 +38,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ các sản phẩm Thu Đông 2024 -->
         <div class="product-card">
-          <img src="assets/img/thu-dong-2024/SM167.jpg" alt="SM167" />
+          <img src="../assets/img/td1.jpg" alt="SM167" />
           <div class="badge">-37%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Overshirt Flannel Caro Thêu SM167</h4>
@@ -46,7 +46,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/thu-dong-2024/QJ106.jpg" alt="QJ106" />
+          <img src="../assets/img/td2.jpg" alt="QJ106" />
           <div class="badge">-27%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jeans Wash Có Thêu QJ106</h4>
@@ -54,7 +54,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/thu-dong-2024/CV077.jpg" alt="CV077" />
+          <img src="../assets/img/td3.jpg" alt="CV077" />
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Cà Vạt Họa Tiết CV077</h4>
@@ -62,7 +62,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/thu-dong-2024/AK062.jpg" alt="AK062" />
+          <img src="../assets/img/td4.jpg" alt="AK062" />
           <div class="badge">-</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Khoác Kaki Business Jacket AK062</h4>

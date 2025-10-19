@@ -38,7 +38,7 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ một số sản phẩm Tết -->
         <div class="product-card">
-          <img src="assets/img/tet2025/AK064.jpg" alt="AK064" />
+          <img src="../assets/img/t1.jpg" alt="AK064" />
           <div class="badge">-20%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Khoác Bomber AK064 – Tết 2025</h4>
@@ -46,7 +46,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/tet2025/QJ111.jpg" alt="QJ111" />
+          <img src="../assets/img/t2.jpg" alt="QJ111" />
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jean QJ111 – Tết 2025</h4>
@@ -54,7 +54,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/tet2025/QT066.jpg" alt="QT066" />
+          <img src="../assets/img/t3.jpg" alt="QT066" />
           <div class="badge">-10%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Tây QT066 – Tết 2025</h4>
@@ -62,7 +62,7 @@
         </div>
 
         <div class="product-card">
-          <img src="assets/img/tet2025/QS062.jpg" alt="QS062" />
+          <img src="../assets/img/t4.jpg" alt="QS062" />
           <div class="badge">-20%</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short QS062 – Tết 2025</h4>

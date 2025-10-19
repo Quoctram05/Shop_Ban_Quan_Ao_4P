@@ -40,28 +40,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/quan1.jpg" alt="Quần Tây QT069">
+          <img src="../assets/img/quan1.jpg" alt="Quần Tây QT069">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Tây Slimfit QT069</h4>
           <p><span class="new">349,000₫</span> <span class="old">425,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/quan2.jpg" alt="Quần Kaki QK031">
+          <img src="../assets/img/quan2.jpg" alt="Quần Kaki QK031">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Kaki Diễu QK031</h4>
           <p><span class="new">404,000₫</span> <span class="old">425,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/quan3.jpg" alt="Quần Jean QJ114">
+          <img src="../assets/img/quan3.jpg" alt="Quần Jean QJ114">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jean QJ114</h4>
           <p><span class="new">518,000₫</span> <span class="old">545,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/quan4.jpg" alt="Quần Short QS076">
+          <img src="../assets/img/quan4.jpg" alt="Quần Short QS076">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Short QS076</h4>

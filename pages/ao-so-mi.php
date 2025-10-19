@@ -40,28 +40,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ sản phẩm -->
         <div class="product-card">
-          <img src="assets/img/somi1.jpg" alt="Sơ mi SM179">
+          <img src="../assets/img/somi1.jpg" alt="Sơ mi SM179">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi SM179</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/somi2.jpg" alt="Sơ mi SM195">
+          <img src="../assets/img/somi2.jpg" alt="Sơ mi SM195">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi SM195</h4>
           <p><span class="new">395,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/somi3.jpg" alt="Sơ mi SM194">
+          <img src="../assets/img/somi3.jpg" alt="Sơ mi SM194">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi SM194</h4>
           <p><span class="new">395,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/somi4.jpg" alt="Sơ mi SM193">
+          <img src="../assets/img/somi4.jpg" alt="Sơ mi SM193">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi SM193</h4>

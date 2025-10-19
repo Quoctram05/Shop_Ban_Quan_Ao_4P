@@ -32,14 +32,14 @@
         <!-- Các mục sản phẩm sẽ chèn JS hoặc viết tĩnh -->
         <!-- Ví dụ: -->
         <div class="product-card">
-          <img src="assets/img/product1.jpg" alt="Sản phẩm 1" />
+          <img src="../assets/img/thoitrang1.jpg" alt="Sản phẩm 1" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Áo Sơ Mi SM179</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/product2.jpg" alt="Sản phẩm 2" />
+          <img src="../assets/img/thoitrang2.jpg" alt="Sản phẩm 2" />
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Quần Jean QJ117</h4>

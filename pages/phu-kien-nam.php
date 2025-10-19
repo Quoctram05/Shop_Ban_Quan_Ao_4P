@@ -44,28 +44,28 @@
       <div class="product-grid" id="product-grid">
         <!-- Ví dụ card phụ kiện -->
         <div class="product-card">
-          <img src="assets/img/product1.jpg" alt="Ví da">
+          <img src="../assets/img/pk1.jpg" alt="Ví da">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Ví Da Epsom Mini BV060</h4>
           <p><span class="new">315,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/product2.jpg" alt="Thắt lưng">
+          <img src="../assets/img/pk2.jpg" alt="Thắt lưng">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Thắt lưng khóa tự động TL195</h4>
           <p><span class="new">275,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/product3.jpg" alt="Ví da">
+          <img src="../assets/img/pk3.jpg" alt="Ví da">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Ví Da Saffiano BV059</h4>
           <p><span class="new">345,000₫</span></p>
         </div>
         <div class="product-card">
-          <img src="assets/img/product4.jpg" alt="Nón">
+          <img src="../assets/img/pk4.jpg" alt="Nón">
           <div class="badge">New</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
           <h4>Nón Snapback NB001</h4>
