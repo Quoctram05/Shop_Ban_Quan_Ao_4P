@@ -1,0 +1,854 @@
+-- ========= RESET =========
+DROP DATABASE IF EXISTS `shop4men`;
+CREATE DATABASE `shop4men` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE `shop4men`;
+
+SET NAMES utf8mb4;
+SET time_zone = '+07:00';
+
+-- ========= 0) HỆ THỐNG =========
+CREATE TABLE IF NOT EXISTS config (
+  `key` VARCHAR(191) PRIMARY KEY,
+  `value` TEXT,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+INSERT IGNORE INTO config(`key`,`value`) VALUES ('new_days','14');
+
+CREATE TABLE IF NOT EXISTS audit_log (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NULL,
+  action VARCHAR(128) NOT NULL,
+  target_table VARCHAR(64) NULL,
+  target_id BIGINT NULL,
+  ip VARCHAR(64) NULL,
+  payload TEXT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS login_log (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NULL,
+  email VARCHAR(191) NULL,
+  success TINYINT(1) NOT NULL,
+  ip VARCHAR(64) NULL,
+  ua TEXT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS background_job (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  job_type VARCHAR(64) NOT NULL,
+  payload TEXT NOT NULL,
+  status ENUM('queued','running','done','failed') DEFAULT 'queued',
+  last_error TEXT NULL,
+  run_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  KEY ix_status_runat (status, run_at)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS webhook_event (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  event_type VARCHAR(64) NOT NULL,
+  payload TEXT NOT NULL,
+  status ENUM('queued','delivered','failed') DEFAULT 'queued',
+  retry_count INT DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ========= 1) NGƯỜI DÙNG / PHÂN QUYỀN =========
+CREATE TABLE IF NOT EXISTS `user` (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  email VARCHAR(191) UNIQUE,
+  phone VARCHAR(32) UNIQUE,
+  password_hash VARCHAR(255) NOT NULL,
+  full_name VARCHAR(191),
+  gender INT DEFAULT 0, -- 0=không rõ,1=nam,2=nữ,3=khác
+  dob DATE NULL,
+  avatar_url VARCHAR(512) NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  is_staff  TINYINT(1) DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS role (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(64) UNIQUE NOT NULL,
+  code VARCHAR(64) UNIQUE NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS permission (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL,
+  code VARCHAR(128) UNIQUE NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS user_role (
+  user_id BIGINT NOT NULL,
+  role_id BIGINT NOT NULL,
+  PRIMARY KEY(user_id, role_id),
+  CONSTRAINT fk_ur_user FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE CASCADE,
+  CONSTRAINT fk_ur_role FOREIGN KEY(role_id) REFERENCES role(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS role_perm (
+  role_id BIGINT NOT NULL,
+  perm_id BIGINT NOT NULL,
+  PRIMARY KEY(role_id, perm_id),
+  CONSTRAINT fk_rp_role FOREIGN KEY(role_id) REFERENCES role(id) ON DELETE CASCADE,
+  CONSTRAINT fk_rp_perm FOREIGN KEY(perm_id) REFERENCES permission(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS customer_profile (
+  user_id BIGINT PRIMARY KEY,
+  loyalty_points INT DEFAULT 0,
+  marketing_opt_in TINYINT(1) DEFAULT 0,
+  note TEXT NULL,
+  CONSTRAINT fk_cp_user FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS staff_profile (
+  user_id BIGINT PRIMARY KEY,
+  position VARCHAR(128) NULL,
+  CONSTRAINT fk_sp_user FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS address (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NULL,
+  name VARCHAR(191) NOT NULL,
+  phone VARCHAR(32) NOT NULL,
+  line1 VARCHAR(191) NOT NULL,
+  line2 VARCHAR(191) NULL,
+  ward VARCHAR(128) NULL,
+  district VARCHAR(128) NULL,
+  province VARCHAR(128) NULL,
+  country VARCHAR(64) DEFAULT 'VN',
+  zip VARCHAR(16) NULL,
+  is_default TINYINT(1) DEFAULT 0,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_addr_user FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+-- ========= 2) DANH MỤC SẢN PHẨM =========
+CREATE TABLE IF NOT EXISTS brand (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(191) NOT NULL,
+  slug VARCHAR(191) UNIQUE,
+  logo_url VARCHAR(512) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS category (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(191) NOT NULL,
+  slug VARCHAR(191) UNIQUE NOT NULL,
+  parent_id BIGINT NULL,
+  path VARCHAR(512) NULL,
+  sort INT DEFAULT 0,
+  CONSTRAINT fk_cat_parent FOREIGN KEY(parent_id) REFERENCES category(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS color (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(64) NOT NULL,
+  code VARCHAR(32) UNIQUE,
+  hex CHAR(7)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS size (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(16) NOT NULL,
+  sort INT DEFAULT 0,
+  UNIQUE(name)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS style (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  brand_id BIGINT NULL,
+  category_id BIGINT NULL,
+  style_code VARCHAR(64) UNIQUE,
+  slug VARCHAR(191) UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_style_brand FOREIGN KEY(brand_id) REFERENCES brand(id) ON DELETE SET NULL,
+  CONSTRAINT fk_style_cat   FOREIGN KEY(category_id) REFERENCES category(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS product (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  style_id BIGINT NOT NULL,
+  color_id BIGINT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  slug VARCHAR(191) UNIQUE NOT NULL,
+  short_desc TEXT NULL,
+  long_desc MEDIUMTEXT NULL,
+  published_at DATETIME NULL,
+  first_instock_at DATETIME NULL,
+  status ENUM('draft','active','archived') DEFAULT 'active',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_prod_style FOREIGN KEY(style_id) REFERENCES style(id) ON DELETE CASCADE,
+  CONSTRAINT fk_prod_color FOREIGN KEY(color_id) REFERENCES color(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS variant (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  product_id BIGINT NOT NULL,
+  size_id BIGINT NOT NULL,
+  sku VARCHAR(64) UNIQUE,
+  price DECIMAL(12,2) NOT NULL,
+  compare_at_price DECIMAL(12,2) NULL,
+  barcode VARCHAR(64) NULL,
+  weight INT NULL,
+  status ENUM('active','disabled') DEFAULT 'active',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_var_prod FOREIGN KEY(product_id) REFERENCES product(id) ON DELETE CASCADE,
+  CONSTRAINT fk_var_size FOREIGN KEY(size_id) REFERENCES size(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- ========= 3) ẢNH / MEDIA =========
+CREATE TABLE IF NOT EXISTS media_origin_whitelist (
+  host VARCHAR(191) PRIMARY KEY
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS media_asset (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  source_url VARCHAR(1024) NOT NULL,
+  source_url_hash CHAR(64) NULL, -- sha256(URL)
+  origin_host VARCHAR(191) NOT NULL,
+  mime VARCHAR(64) NULL,
+  bytes INT NULL,
+  width INT NULL, height INT NULL,
+  sha256 CHAR(64) NULL,         -- sha256(file)
+  storage_path VARCHAR(512) NULL,
+  status ENUM('external','cached','blocked','deleted') DEFAULT 'external',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_src_hash (source_url_hash),
+  KEY ix_origin (origin_host)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS product_media (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  product_id BIGINT NOT NULL,
+  variant_id BIGINT NULL,
+  media_id BIGINT NOT NULL,
+  role ENUM('main','gallery','detail') DEFAULT 'gallery',
+  sort_order INT DEFAULT 0,
+  alt_text VARCHAR(255) NULL,
+  CONSTRAINT fk_pm_product FOREIGN KEY(product_id) REFERENCES product(id) ON DELETE CASCADE,
+  CONSTRAINT fk_pm_variant FOREIGN KEY(variant_id) REFERENCES variant(id) ON DELETE SET NULL,
+  CONSTRAINT fk_pm_media   FOREIGN KEY(media_id) REFERENCES media_asset(id) ON DELETE CASCADE,
+  INDEX ix_pm_product (product_id, role, sort_order)
+) ENGINE=InnoDB;
+
+-- ========= 4) KHO / TỒN =========
+CREATE TABLE IF NOT EXISTS warehouse (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(128) NOT NULL,
+  code VARCHAR(32) UNIQUE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS stock (
+  variant_id BIGINT NOT NULL,
+  warehouse_id BIGINT NOT NULL,
+  qty INT NOT NULL DEFAULT 0,
+  PRIMARY KEY(variant_id, warehouse_id),
+  CONSTRAINT fk_stock_variant   FOREIGN KEY(variant_id) REFERENCES variant(id) ON DELETE CASCADE,
+  CONSTRAINT fk_stock_warehouse FOREIGN KEY(warehouse_id) REFERENCES warehouse(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS stock_movement (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  variant_id BIGINT NOT NULL,
+  warehouse_id BIGINT NOT NULL,
+  move_type ENUM('IN','OUT','ADJ','RESERVE','RELEASE','RETURN') NOT NULL,
+  qty INT NOT NULL,
+  ref_type VARCHAR(32) NULL,
+  ref_id BIGINT NULL,
+  note VARCHAR(255) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_sm_variant FOREIGN KEY(variant_id) REFERENCES variant(id) ON DELETE CASCADE,
+  CONSTRAINT fk_sm_wh      FOREIGN KEY(warehouse_id) REFERENCES warehouse(id) ON DELETE CASCADE,
+  INDEX ix_sm_ref (ref_type, ref_id)
+) ENGINE=InnoDB;
+
+DROP VIEW IF EXISTS v_stock_total;
+CREATE VIEW v_stock_total AS
+SELECT variant_id, SUM(qty) qty
+FROM stock
+GROUP BY variant_id;
+
+DELIMITER $$
+DROP TRIGGER IF EXISTS trg_stock_movement_apply $$
+CREATE TRIGGER trg_stock_movement_apply
+AFTER INSERT ON stock_movement
+FOR EACH ROW
+BEGIN
+  DECLARE pid BIGINT DEFAULT NULL;
+  DECLARE qty_delta INT DEFAULT 0;
+  DECLARE total_qty INT DEFAULT 0;
+
+  SET qty_delta = CASE NEW.move_type
+                    WHEN 'IN'      THEN NEW.qty
+                    WHEN 'RETURN'  THEN NEW.qty
+                    WHEN 'ADJ'     THEN NEW.qty
+                    WHEN 'OUT'     THEN -NEW.qty
+                    WHEN 'RESERVE' THEN 0
+                    WHEN 'RELEASE' THEN 0
+                  END;
+
+  INSERT INTO stock(variant_id, warehouse_id, qty)
+  VALUES(NEW.variant_id, NEW.warehouse_id, qty_delta)
+  ON DUPLICATE KEY UPDATE qty = qty + VALUES(qty);
+
+  SELECT v.product_id INTO pid FROM variant v WHERE v.id = NEW.variant_id;
+
+  IF pid IS NOT NULL THEN
+    SELECT COALESCE(SUM(s.qty),0) INTO total_qty
+      FROM stock s
+      JOIN variant v2 ON v2.id = s.variant_id
+     WHERE v2.product_id = pid;
+
+    IF total_qty > 0 THEN
+      UPDATE product
+         SET first_instock_at = IFNULL(first_instock_at, NOW())
+       WHERE id = pid;
+    END IF;
+  END IF;
+END $$
+DELIMITER ;
+
+-- ========= 5) GIÁ / VOUCHER / KHUYẾN MÃI =========
+DROP VIEW IF EXISTS v_variant_pricing;
+CREATE VIEW v_variant_pricing AS
+SELECT v.id AS variant_id, v.product_id,
+       v.price AS base_price,
+       v.compare_at_price,
+       v.price AS final_price,
+       CASE WHEN v.compare_at_price IS NOT NULL AND v.compare_at_price > v.price
+            THEN ROUND(100*(v.compare_at_price - v.price)/v.compare_at_price,0)
+            ELSE 0 END AS discount_pct,
+       (v.compare_at_price IS NOT NULL AND v.compare_at_price > v.price) AS is_on_sale
+FROM variant v;
+
+CREATE TABLE IF NOT EXISTS promotion (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(191) NOT NULL,
+  start_at DATETIME NOT NULL,
+  end_at DATETIME NOT NULL,
+  stackable TINYINT(1) DEFAULT 0,
+  rules_json TEXT NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS promotion_item (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  promotion_id BIGINT NOT NULL,
+  variant_id BIGINT NULL,
+  product_id BIGINT NULL,
+  category_id BIGINT NULL,
+  brand_id BIGINT NULL,
+  discount_type ENUM('amount','percent') NOT NULL,
+  discount_value DECIMAL(12,2) NOT NULL,
+  CONSTRAINT fk_pitem_promo FOREIGN KEY(promotion_id) REFERENCES promotion(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS voucher (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  code VARCHAR(32) UNIQUE NOT NULL,
+  discount_type ENUM('amount','percent') NOT NULL,
+  discount_value DECIMAL(12,2) NOT NULL,
+  min_order_amount DECIMAL(12,2) DEFAULT 0,
+  start_at DATETIME NOT NULL,
+  end_at DATETIME NOT NULL,
+  scope ENUM('global','brand','category','product') DEFAULT 'global',
+  scope_id BIGINT NULL,
+  usage_limit INT NULL,
+  used_count INT DEFAULT 0,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS voucher_usage (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  voucher_id BIGINT NOT NULL,
+  order_id BIGINT NOT NULL,
+  user_id BIGINT NULL,
+  amount DECIMAL(12,2) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_vu_voucher FOREIGN KEY(voucher_id) REFERENCES voucher(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ========= 6) GIỎ HÀNG / ĐƠN HÀNG =========
+CREATE TABLE IF NOT EXISTS cart (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NULL,
+  session_id VARCHAR(64) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_cart_user (user_id),
+  UNIQUE KEY uq_cart_session (session_id),
+  CONSTRAINT fk_cart_user FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS cart_item (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  cart_id BIGINT NOT NULL,
+  variant_id BIGINT NOT NULL,
+  qty INT NOT NULL,
+  price_snapshot DECIMAL(12,2) NOT NULL,
+  compare_at_snapshot DECIMAL(12,2) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_ci_cart    FOREIGN KEY(cart_id) REFERENCES cart(id) ON DELETE CASCADE,
+  CONSTRAINT fk_ci_variant FOREIGN KEY(variant_id) REFERENCES variant(id) ON DELETE RESTRICT,
+  UNIQUE KEY uq_cart_variant (cart_id, variant_id)
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `order` (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  code VARCHAR(32) UNIQUE NOT NULL,
+  user_id BIGINT NULL,
+  status ENUM('pending','confirmed','picking','shipping','completed','cancelled','refunded') DEFAULT 'pending',
+  subtotal DECIMAL(12,2) NOT NULL DEFAULT 0,
+  discount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  shipping_fee DECIMAL(12,2) NOT NULL DEFAULT 0,
+  total DECIMAL(12,2) NOT NULL DEFAULT 0,
+  note TEXT NULL,
+  shipping_address_id BIGINT NULL,
+  billing_address_id BIGINT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  CONSTRAINT fk_order_user FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE SET NULL,
+  CONSTRAINT fk_order_shipaddr FOREIGN KEY(shipping_address_id) REFERENCES address(id) ON DELETE SET NULL,
+  CONSTRAINT fk_order_billaddr FOREIGN KEY(billing_address_id) REFERENCES address(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS order_item (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_id BIGINT NOT NULL,
+  variant_id BIGINT NOT NULL,
+  qty INT NOT NULL,
+  price DECIMAL(12,2) NOT NULL,
+  compare_at_price DECIMAL(12,2) NULL,
+  discount DECIMAL(12,2) NOT NULL DEFAULT 0,
+  total DECIMAL(12,2) NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_oi_order   FOREIGN KEY(order_id) REFERENCES `order`(id) ON DELETE CASCADE,
+  CONSTRAINT fk_oi_variant FOREIGN KEY(variant_id) REFERENCES variant(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS order_status_history (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_id BIGINT NOT NULL,
+  status VARCHAR(32) NOT NULL,
+  note VARCHAR(255) NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_osh_order FOREIGN KEY(order_id) REFERENCES `order`(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS payment (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_id BIGINT NOT NULL,
+  method VARCHAR(32) NOT NULL, -- COD, VNPay, Momo...
+  amount DECIMAL(12,2) NOT NULL,
+  currency CHAR(3) DEFAULT 'VND',
+  status ENUM('pending','paid','failed','refunded') DEFAULT 'pending',
+  txn_id VARCHAR(128) NULL,
+  paid_at DATETIME NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_pay_order FOREIGN KEY(order_id) REFERENCES `order`(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS shipment (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_id BIGINT NOT NULL,
+  carrier VARCHAR(64) NULL,
+  service VARCHAR(64) NULL,
+  tracking_no VARCHAR(64) NULL,
+  fee DECIMAL(12,2) DEFAULT 0,
+  status ENUM('ready','shipping','delivered','failed','returned') DEFAULT 'ready',
+  shipped_at DATETIME NULL,
+  delivered_at DATETIME NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_ship_order FOREIGN KEY(order_id) REFERENCES `order`(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS return_order (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  order_id BIGINT NOT NULL,
+  status ENUM('requested','approved','rejected','received','refunded') DEFAULT 'requested',
+  reason TEXT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_ro_order FOREIGN KEY(order_id) REFERENCES `order`(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS return_item (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  return_order_id BIGINT NOT NULL,
+  order_item_id BIGINT NOT NULL,
+  qty INT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_ri_ro  FOREIGN KEY(return_order_id) REFERENCES return_order(id) ON DELETE CASCADE,
+  CONSTRAINT fk_ri_oi  FOREIGN KEY(order_item_id) REFERENCES order_item(id) ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- ========= 7) ĐÁNH GIÁ / YÊU THÍCH =========
+CREATE TABLE IF NOT EXISTS review (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  product_id BIGINT NOT NULL,
+  user_id BIGINT NULL,
+  rating INT NOT NULL,
+  content TEXT NULL,
+  status ENUM('pending','approved','hidden') DEFAULT 'approved',
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  CONSTRAINT fk_rev_prod FOREIGN KEY(product_id) REFERENCES product(id) ON DELETE CASCADE,
+  CONSTRAINT fk_rev_user FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+DROP VIEW IF EXISTS v_product_rating;
+CREATE VIEW v_product_rating AS
+SELECT product_id, COUNT(*) AS rating_count, ROUND(AVG(rating),1) AS avg_star
+FROM review WHERE status='approved'
+GROUP BY product_id;
+
+CREATE TABLE IF NOT EXISTS wishlist (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NOT NULL,
+  product_id BIGINT NOT NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+  UNIQUE KEY uq_wl (user_id, product_id),
+  CONSTRAINT fk_wl_user FOREIGN KEY(user_id) REFERENCES `user`(id) ON DELETE CASCADE,
+  CONSTRAINT fk_wl_prod FOREIGN KEY(product_id) REFERENCES product(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS newsletter_optin (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  user_id BIGINT NULL,
+  email VARCHAR(191) NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ========= 8) NỘI DUNG / SEO =========
+CREATE TABLE IF NOT EXISTS page (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(191) NOT NULL,
+  slug VARCHAR(191) UNIQUE NOT NULL,
+  body MEDIUMTEXT NULL,
+  published_at DATETIME NULL,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS banner (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(191) NULL,
+  image_url VARCHAR(512) NOT NULL,
+  link_url VARCHAR(512) NULL,
+  start_at DATETIME NULL,
+  end_at DATETIME NULL,
+  is_active TINYINT(1) DEFAULT 1,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS menu (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  name VARCHAR(64) NOT NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS menu_item (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  menu_id BIGINT NOT NULL,
+  parent_id BIGINT NULL,
+  title VARCHAR(191) NOT NULL,
+  url VARCHAR(512) NOT NULL,
+  sort INT DEFAULT 0,
+  CONSTRAINT fk_mi_menu FOREIGN KEY(menu_id) REFERENCES menu(id) ON DELETE CASCADE,
+  CONSTRAINT fk_mi_parent FOREIGN KEY(parent_id) REFERENCES menu_item(id) ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS redirect (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  source_path VARCHAR(255) UNIQUE NOT NULL,
+  target_url VARCHAR(512) NOT NULL,
+  http_code INT DEFAULT 301
+) ENGINE=InnoDB;
+
+-- ========= 9) HUY HIỆU SẢN PHẨM =========
+CREATE TABLE IF NOT EXISTS product_badge (
+  id BIGINT PRIMARY KEY AUTO_INCREMENT,
+  product_id BIGINT NOT NULL,
+  badge_type ENUM('new','sale','hot','best') NOT NULL,
+  label VARCHAR(50) NULL,
+  start_at DATETIME NULL,
+  end_at DATETIME NULL,
+  priority INT DEFAULT 0,
+  is_active TINYINT(1) DEFAULT 1,
+  UNIQUE KEY uq_prod_badge (product_id, badge_type, start_at),
+  INDEX ix_badge_time (start_at, end_at, is_active),
+  CONSTRAINT fk_pb_prod FOREIGN KEY(product_id) REFERENCES product(id) ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ========= 10) VIEW TIỆN ÍCH =========
+DROP VIEW IF EXISTS v_product_main_image;
+CREATE VIEW v_product_main_image AS
+SELECT p.id AS product_id,
+       (SELECT COALESCE(ma.storage_path, ma.source_url)
+          FROM product_media pm
+          JOIN media_asset ma ON ma.id=pm.media_id
+         WHERE pm.product_id=p.id AND pm.role='main'
+         ORDER BY pm.sort_order ASC, pm.id ASC LIMIT 1) AS main_image
+FROM product p;
+
+DROP VIEW IF EXISTS v_new_products;
+CREATE VIEW v_new_products AS
+SELECT p.*
+  FROM product p
+ WHERE COALESCE(p.published_at, p.created_at) >=
+       DATE_SUB(NOW(), INTERVAL CAST((SELECT `value` FROM config WHERE `key`='new_days') AS UNSIGNED) DAY);
+
+DROP VIEW IF EXISTS v_order_list;
+CREATE VIEW v_order_list AS
+SELECT o.id, o.code, o.status, o.total, o.created_at,
+       u.full_name, u.email, u.phone
+  FROM `order` o
+  LEFT JOIN `user` u ON u.id=o.user_id;
+
+-- ========= 11) INDEX =========
+CREATE INDEX ix_product_slug  ON product(slug);
+CREATE INDEX ix_style_slug    ON style(slug);
+CREATE INDEX ix_category_slug ON category(slug);
+CREATE INDEX ix_variant_prod  ON variant(product_id, size_id);
+CREATE INDEX ix_order_status  ON `order`(status, created_at);
+CREATE INDEX ix_payment_stat  ON payment(status, created_at);
+CREATE INDEX ix_shipment_stat ON shipment(status, shipped_at);
+
+-- ========= 12) DỮ LIỆU MẪU TIẾNG VIỆT =========
+-- Cấu hình
+INSERT INTO config(`key`,`value`) VALUES
+ ('shop_name','Cửa hàng 4MEN'),
+ ('currency','VND'),
+ ('timezone','Asia/Ho_Chi_Minh'),
+ ('support_email','hotro@4men.local'),
+ ('hotline','028 2222 3333'),
+ ('address','123 Nguyễn Trãi'),
+ ('city','TP. Hồ Chí Minh'),
+ ('country','VN'),
+ ('vat_rate','0.08'),
+ ('shipping_base_fee','25000'),
+ ('shipping_free_threshold','499000'),
+ ('maintenance_mode','0')
+ON DUPLICATE KEY UPDATE `value`=VALUES(`value`);
+
+-- Vai trò
+INSERT INTO role (name, code) VALUES
+  ('Quản trị viên','ADMIN'),
+  ('Quản lý cửa hàng','MANAGER'),
+  ('Thủ kho','WAREHOUSE'),
+  ('CSKH','CUSTOMER_SERVICE'),
+  ('Marketing','MARKETING'),
+  ('Kế toán','ACCOUNTING'),
+  ('Biên tập nội dung','CONTENT_EDITOR'),
+  ('SEO','SEO'),
+  ('Hỗ trợ kỹ thuật','SUPPORT'),
+  ('Phân tích dữ liệu','ANALYST'),
+  ('Thành viên','MEMBER'),
+  ('Khách','GUEST');
+
+-- Quyền
+INSERT INTO permission(name,code) VALUES
+ ('Xem tổng quan','VIEW_DASHBOARD'),
+ ('Quản lý người dùng','MANAGE_USER'),
+ ('Quản lý vai trò','MANAGE_ROLE'),
+ ('Cấu hình hệ thống','MANAGE_SETTING'),
+ ('Quản lý trang tĩnh','MANAGE_PAGE'),
+ ('Quản lý menu','MANAGE_MENU'),
+ ('Quản lý voucher','MANAGE_VOUCHER'),
+ ('Quản lý khuyến mãi','MANAGE_PROMOTION'),
+ ('Xem báo cáo','VIEW_REPORT'),
+ ('Quản lý đơn hàng','MANAGE_ORDER'),
+ ('Hoàn tiền đơn hàng','REFUND_ORDER'),
+ ('Quản lý tồn kho','MANAGE_STOCK'),
+ ('Áp dụng voucher','APPLY_VOUCHER'),
+ ('Thêm vào giỏ','ADD_TO_CART'),
+ ('Tạo đơn hàng','CREATE_ORDER'),
+ ('Xem đơn của mình','VIEW_ORDER_SELF'),
+ ('Quản lý banner','MANAGE_BANNER'),
+ ('Xem nhật ký','VIEW_LOG');
+
+-- Gán quyền
+INSERT INTO role_perm(role_id,perm_id)
+SELECT r.id, p.id FROM role r JOIN permission p WHERE r.code='ADMIN';
+
+INSERT INTO role_perm(role_id,perm_id)
+SELECT (SELECT id FROM role WHERE code='MANAGER'), p.id
+FROM permission p
+WHERE p.code IN ('VIEW_DASHBOARD','MANAGE_ORDER','MANAGE_STOCK','VIEW_REPORT','MANAGE_USER','MANAGE_SETTING');
+
+INSERT INTO role_perm(role_id,perm_id)
+SELECT (SELECT id FROM role WHERE code='CUSTOMER_SERVICE'), p.id
+FROM permission p WHERE p.code IN ('VIEW_DASHBOARD','MANAGE_ORDER','REFUND_ORDER','VIEW_REPORT');
+
+INSERT INTO role_perm(role_id,perm_id)
+SELECT (SELECT id FROM role WHERE code='MEMBER'), p.id
+FROM permission p WHERE p.code IN ('APPLY_VOUCHER','ADD_TO_CART','CREATE_ORDER','VIEW_ORDER_SELF');
+
+-- Người dùng mẫu
+SET @pwd := '$2y$10$abcdefghijklmnopqrstuvABCDEFGHijklmnOPQRSTuv1234567890ab';
+
+INSERT INTO `user`(email,phone,password_hash,full_name,gender,is_active,is_staff) VALUES
+ ('admin@4men.local','0909000001',@pwd,'Nguyễn Minh Quân',1,1,1),
+ ('quanly@4men.local','0909000002',@pwd,'Trần Thu Hà',2,1,1),
+ ('thukho@4men.local','0909000003',@pwd,'Phạm Quốc Bảo',1,1,1),
+ ('cskh@4men.local','0909000004',@pwd,'Lê Bảo Ngọc',2,1,1),
+ ('mkt@4men.local','0909000005',@pwd,'Đinh Gia Huy',1,1,1),
+ ('ketoan@4men.local','0909000006',@pwd,'Vũ Thanh Tâm',2,1,1),
+ ('bien_tap@4men.local','0909000007',@pwd,'Hoàng Nhật Nam',1,1,0),
+ ('seo@4men.local','0909000008',@pwd,'Đỗ Quỳnh Anh',2,1,0),
+ ('support@4men.local','0909000009',@pwd,'Bùi Hữu Phúc',1,1,0),
+ ('phan_tich@4men.local','0909000010',@pwd,'Trịnh Hải Yến',2,1,0),
+ ('thanhvien@4men.local','0909000011',@pwd,'Phạm Đức Hiếu',1,1,0),
+ ('khach@4men.local','0909000012',@pwd,'Khách Ẩn Danh',0,1,0);
+
+INSERT INTO user_role(user_id,role_id)
+SELECT u.id,(SELECT id FROM role WHERE code='MEMBER') FROM `user` u;
+
+INSERT INTO user_role(user_id,role_id)
+SELECT (SELECT id FROM `user` WHERE email='admin@4men.local'), (SELECT id FROM role WHERE code='ADMIN')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='quanly@4men.local'), (SELECT id FROM role WHERE code='MANAGER')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='thukho@4men.local'), (SELECT id FROM role WHERE code='WAREHOUSE')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='cskh@4men.local'), (SELECT id FROM role WHERE code='CUSTOMER_SERVICE')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='mkt@4men.local'), (SELECT id FROM role WHERE code='MARKETING')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='ketoan@4men.local'), (SELECT id FROM role WHERE code='ACCOUNTING')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='bien_tap@4men.local'), (SELECT id FROM role WHERE code='CONTENT_EDITOR')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='seo@4men.local'), (SELECT id FROM role WHERE code='SEO')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='support@4men.local'), (SELECT id FROM role WHERE code='SUPPORT')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='phan_tich@4men.local'), (SELECT id FROM role WHERE code='ANALYST')
+UNION ALL
+SELECT (SELECT id FROM `user` WHERE email='khach@4men.local'), (SELECT id FROM role WHERE code='GUEST');
+
+INSERT INTO customer_profile(user_id,loyalty_points,marketing_opt_in) VALUES
+ (1,1500,1),(2,900,1),(3,0,0),(4,220,1),(5,500,1),(6,60,0),
+ (7,210,1),(8,0,0),(9,30,0),(10,10,0),(11,300,1),(12,0,0);
+
+INSERT INTO staff_profile(user_id,position) VALUES
+ (1,'Quản trị viên'),(2,'Quản lý cửa hàng'),(3,'Thủ kho'),(4,'CSKH'),
+ (5,'Chuyên viên Marketing'),(6,'Kế toán'),(7,'Biên tập viên'),(8,'Chuyên viên SEO'),
+ (9,'Hỗ trợ kỹ thuật'),(10,'Chuyên viên Phân tích'),(11,'Chăm sóc thành viên'),(12,'Khách');
+
+INSERT INTO address(user_id,name,phone,line1,ward,district,province,country,is_default) VALUES
+ (1,'Nguyễn Minh Quân','0909000001','123 Nguyễn Trãi','Phường 2','Quận 5','TP. Hồ Chí Minh','VN',1),
+ (2,'Trần Thu Hà','0909000002','45 Lê Lợi','Bến Nghé','Quận 1','TP. Hồ Chí Minh','VN',1),
+ (3,'Phạm Quốc Bảo','0909000003','10 Lý Thường Kiệt','Phường 7','Tân Bình','TP. Hồ Chí Minh','VN',1),
+ (4,'Lê Bảo Ngọc','0909000004','56 Trần Hưng Đạo','Cầu Kho','Quận 1','TP. Hồ Chí Minh','VN',1),
+ (5,'Đinh Gia Huy','0909000005','78 Cách Mạng Tháng 8','Phường 7','Tân Bình','TP. Hồ Chí Minh','VN',1),
+ (6,'Vũ Thanh Tâm','0909000006','90 Pasteur','Phường 6','Quận 3','TP. Hồ Chí Minh','VN',1),
+ (7,'Hoàng Nhật Nam','0909000007','11 Trần Quang Khải','Tân Định','Quận 1','TP. Hồ Chí Minh','VN',1),
+ (8,'Đỗ Quỳnh Anh','0909000008','22 Phan Xích Long','Phường 2','Phú Nhuận','TP. Hồ Chí Minh','VN',1),
+ (9,'Bùi Hữu Phúc','0909000009','33 Cộng Hòa','Phường 4','Tân Bình','TP. Hồ Chí Minh','VN',1),
+ (10,'Trịnh Hải Yến','0909000010','44 Trường Sơn','Phường 2','Tân Bình','TP. Hồ Chí Minh','VN',1),
+ (11,'Phạm Đức Hiếu','0909000011','55 Nguyễn Oanh','Phường 17','Gò Vấp','TP. Hồ Chí Minh','VN',1),
+ (12,'Khách Ẩn Danh','0909000012','66 Quang Trung','Phường 10','Gò Vấp','TP. Hồ Chí Minh','VN',1);
+
+-- Thương hiệu
+INSERT INTO brand(name,slug) VALUES
+ ('4MEN','4men'),('Nội địa A','noi-dia-a'),('Nội địa B','noi-dia-b')
+ON DUPLICATE KEY UPDATE name=VALUES(name);
+
+-- DANH MỤC: tách 2 bước để tránh lỗi #1093
+-- 1) Cha
+INSERT INTO category(name,slug,parent_id,path,sort) VALUES
+ ('Hàng mới','hang-moi',NULL,'/hang-moi',1),
+ ('Áo','ao',NULL,'/ao',2),
+ ('Quần','quan',NULL,'/quan',3),
+ ('Phụ kiện','phu-kien',NULL,'/phu-kien',4)
+ON DUPLICATE KEY UPDATE name=VALUES(name), path=VALUES(path), sort=VALUES(sort);
+
+-- 2) Lấy id cha
+SELECT id INTO @id_ao   FROM category WHERE slug='ao'       LIMIT 1;
+SELECT id INTO @id_quan FROM category WHERE slug='quan'     LIMIT 1;
+SELECT id INTO @id_pk   FROM category WHERE slug='phu-kien' LIMIT 1;
+
+-- 3) Con
+INSERT INTO category(name,slug,parent_id,path,sort) VALUES
+ ('Áo thun','ao-thun',@id_ao,'/ao/ao-thun',10),
+ ('Áo polo','ao-polo',@id_ao,'/ao/ao-polo',11),
+ ('Sơ mi','so-mi',@id_ao,'/ao/so-mi',12),
+ ('Quần jean','quan-jean',@id_quan,'/quan/quan-jean',13),
+ ('Quần tây','quan-tay',@id_quan,'/quan/quan-tay',14),
+ ('Thắt lưng','that-lung',@id_pk,'/phu-kien/that-lung',15),
+ ('Ví da','vi-da',@id_pk,'/phu-kien/vi-da',16)
+ON DUPLICATE KEY UPDATE parent_id=VALUES(parent_id), path=VALUES(path), sort=VALUES(sort);
+
+-- Màu sắc
+INSERT INTO color(name,code,hex) VALUES
+ ('Đen','DEN','#000000'),
+ ('Trắng','TRANG','#FFFFFF'),
+ ('Xanh navy','NAVY','#1f2a44'),
+ ('Xám','XAM','#888888'),
+ ('Be','BE','#d9c7a1'),
+ ('Đỏ rượu','DO','#5a0f2e')
+ON DUPLICATE KEY UPDATE name=VALUES(name), hex=VALUES(hex);
+
+-- Size
+INSERT INTO size(name,sort) VALUES ('S',1),('M',2),('L',3),('XL',4),('XXL',5)
+ON DUPLICATE KEY UPDATE sort=VALUES(sort);
+
+-- Trang nội dung
+INSERT INTO page(title,slug,body,published_at) VALUES
+ ('Giới thiệu','gioi-thieu','<p>Thời trang nam hiện đại dành cho người Việt.</p>',NOW()),
+ ('Liên hệ','lien-he','<p>Hotline: 028 2222 3333 - Email: hotro@4men.local</p>',NOW()),
+ ('Hướng dẫn chọn size','huong-dan-size','<p>Bảng size dành cho người Việt.</p>',NOW()),
+ ('Chính sách giao hàng','chinh-sach-giao-hang','<p>Giao nhanh toàn quốc.</p>',NOW()),
+ ('Chính sách đổi trả','chinh-sach-doi-tra','<p>Đổi trả trong 7 ngày.</p>',NOW()),
+ ('Bảo mật','bao-mat','<p>Bảo mật thông tin khách hàng.</p>',NOW());
+
+-- Menu + item
+INSERT INTO menu(name) VALUES ('main'),('footer');
+
+INSERT INTO menu_item(menu_id,title,url,sort) VALUES
+ ((SELECT id FROM menu WHERE name='main'),'Trang chủ','/',1),
+ ((SELECT id FROM menu WHERE name='main'),'Hàng mới','/hang-moi',2),
+ ((SELECT id FROM menu WHERE name='main'),'Áo','/ao',3),
+ ((SELECT id FROM menu WHERE name='main'),'Quần','/quan',4),
+ ((SELECT id FROM menu WHERE name='main'),'Phụ kiện','/phu-kien',5),
+ ((SELECT id FROM menu WHERE name='main'),'Liên hệ','/page/lien-he',6),
+ ((SELECT id FROM menu WHERE name='footer'),'Giới thiệu','/page/gioi-thieu',1),
+ ((SELECT id FROM menu WHERE name='footer'),'Chính sách giao hàng','/page/chinh-sach-giao-hang',2),
+ ((SELECT id FROM menu WHERE name='footer'),'Chính sách đổi trả','/page/chinh-sach-doi-tra',3),
+ ((SELECT id FROM menu WHERE name='footer'),'Bảo mật','/page/bao-mat',4);
+
+-- Redirect
+INSERT INTO redirect(source_path,target_url,http_code) VALUES
+ ('/gioi-thieu','/page/gioi-thieu',301),
+ ('/lien-he','/page/lien-he',301),
+ ('/size','/page/huong-dan-size',301);
+
+-- Voucher
+INSERT INTO voucher(code,discount_type,discount_value,min_order_amount,start_at,end_at,scope,is_active) VALUES
+ ('CHAO_50K','amount',50000,0, NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 60 DAY,'global',1),
+ ('MOI10','percent',10,299000, NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 30 DAY,'global',1),
+ ('TUAN_LE_DEN','percent',15,499000, NOW() - INTERVAL 2 DAY, NOW() + INTERVAL 5 DAY,'global',1),
+ ('FREESHIP25','amount',25000,199000, NOW() - INTERVAL 1 DAY, NOW() + INTERVAL 45 DAY,'global',1);
+
+-- Khuyến mãi
+INSERT INTO promotion(name,start_at,end_at,stackable,is_active) VALUES
+ ('Tuần lễ đen',       NOW() - INTERVAL 2 DAY,  NOW() + INTERVAL 5 DAY,  0,1),
+ ('Ưu đãi khách mới',  NOW() - INTERVAL 7 DAY,  NOW() + INTERVAL 21 DAY, 1,1),
+ ('Giữa mùa',          NOW() - INTERVAL 1 DAY,  NOW() + INTERVAL 20 DAY, 0,1),
+ ('Flash Sale hôm nay',NOW(),                   NOW() + INTERVAL 1 DAY,  0,1),
+ ('Cuối tuần sôi động',NOW() + INTERVAL 3 DAY,  NOW() + INTERVAL 5 DAY,  0,1);
