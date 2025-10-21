@@ -1,4 +1,4 @@
-x<?php include('header.php'); ?>
+<?php include('header.php'); ?>
 <?php include('navbar.php'); ?>
 
   <!-- ===== BANNER SLIDER ===== -->
