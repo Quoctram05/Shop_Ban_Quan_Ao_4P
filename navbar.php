@@ -74,10 +74,16 @@
       </ul>
     </nav>
 
-    <div class="search-box">
-      <input type="text" id="search" placeholder="Tìm sản phẩm...">
+    <div class="search-box" style="position: relative;">
+  <form action="<?php echo $base_url; ?>pages/timkiem.php" method="GET">
+    <input type="text" id="search" name="q" placeholder="Tìm sản phẩm..." autocomplete="off">
+    <button type="submit" style="background:none;border:none;cursor:pointer;">
       <i class="fa-solid fa-magnifying-glass"></i>
-    </div>
+    </button>
+  </form>
+  <div id="suggestions"></div>
+</div>
+
 
     <div class="icons">
   <a href="<?php echo $base_url; ?>login.php">
