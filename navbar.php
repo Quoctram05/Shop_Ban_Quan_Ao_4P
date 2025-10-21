@@ -80,11 +80,13 @@
     </div>
 
     <div class="icons">
-      <a href="#"><i class="fa-regular fa-user"></i></a>
-      <a href="#" class="cart">
-        <i class="fa-solid fa-cart-shopping"></i>
-        <span class="count">2</span>
-      </a>
-    </div>
+  <a href="<?php echo $base_url; ?>login.php">
+    <i class="fa-regular fa-user"></i>
+  </a>
+  <a href="<?php echo $base_url; ?>pages/cart.php" class="cart">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <span class="count">2</span>
+  </a>
+</div>
   </div>
 </header>
