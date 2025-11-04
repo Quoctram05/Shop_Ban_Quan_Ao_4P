@@ -1,6 +1,10 @@
 <!-- ccccccccccccccccccccccccccccc -->
-<?php include('header.php'); ?>
-<?php include('navbar.php'); ?>
+<?php 
+include('header.php'); 
+include('navbar.php'); 
+include('public/connect.php');
+?>
+
 
   <!-- ===== BANNER SLIDER ===== -->
   <section class="banner">

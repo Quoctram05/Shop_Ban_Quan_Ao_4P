@@ -38,51 +38,19 @@
   <!-- Danh sách sản phẩm Áo Thun -->
   <section class="product-section section">
     <div class="container">
+    
       <div class="product-grid" id="product-grid">
-        <!-- Ví dụ sản phẩm -->
-        <div class="product-card">
-          <img src="../assets/img/aothun1.jpg" alt="Áo Thun AT179">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Ba Lỗ AT179</h4>
-          <p><span class="new">195,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/aothun2.jpg" alt="Áo Thun AT177">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Thun phối vai AT177</h4>
-          <p><span class="new">245,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/aothun3.jpg" alt="Áo Thun AT176">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Thun phối 2 màu AT176</h4>
-          <p><span class="new">245,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/aothun4.jpg" alt="Áo Thun AT174">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Thun Wash Loang AT174</h4>
-          <p><span class="new">325,000₫</span></p>
-        </div>
-        <!-- Thêm nhiều sản phẩm nếu cần -->
+        <p>Đang tải sản phẩm, vui lòng chờ...</p>
       </div>
 
-      <!-- Phân trang -->
-      <div class="pagination">
-        <button class="page-btn prev" disabled>&laquo;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn next">&raquo;</button>
-      </div>
+      <div class="pagination" id="pagination-controls">
+        </div>
     </div>
   </section>
 
 <?php include('../footer.php'); ?>
+
+<script src="../assets/js/ao-thun.js"></script>
 
 </body>
 </html>

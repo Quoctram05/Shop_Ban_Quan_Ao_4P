@@ -41,47 +41,14 @@
   <!-- Danh sách sản phẩm phụ kiện -->
   <section class="product-section section">
     <div class="container">
+    
       <div class="product-grid" id="product-grid">
-        <!-- Ví dụ card phụ kiện -->
-        <div class="product-card">
-          <img src="../assets/img/pk1.jpg" alt="Ví da">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Ví Da Epsom Mini BV060</h4>
-          <p><span class="new">315,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/pk2.jpg" alt="Thắt lưng">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Thắt lưng khóa tự động TL195</h4>
-          <p><span class="new">275,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/pk3.jpg" alt="Ví da">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Ví Da Saffiano BV059</h4>
-          <p><span class="new">345,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/pk4.jpg" alt="Nón">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Nón Snapback NB001</h4>
-          <p><span class="new">199,000₫</span></p>
-        </div>
-        <!-- Thêm các sản phẩm phụ khác -->
+        <p>Đang tải sản phẩm, vui lòng chờ...</p>
       </div>
 
-      <!-- Phân trang -->
-      <div class="pagination">
-        <button class="page-btn prev" disabled>&laquo;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn next">&raquo;</button>
-      </div>
+      <div class="pagination" id="pagination-controls">
+        </div>
+
     </div>
   </section>
 
