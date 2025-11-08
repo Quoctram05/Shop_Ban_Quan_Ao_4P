@@ -49,5 +49,8 @@
     </div>
   </section>
 <?php include('../footer.php'); ?>
+<script>
+    const PAGE_CATEGORIES = 'non-mu'; 
+</script>
 </body>
 </html>

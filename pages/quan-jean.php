@@ -49,5 +49,8 @@
   </section>
 
 <?php include('../footer.php'); ?>
+<script>
+    const PAGE_CATEGORIES = 'quan-jean'; 
+</script>
 </body>
 </html>

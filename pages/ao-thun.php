@@ -50,7 +50,10 @@
 
 <?php include('../footer.php'); ?>
 
-<script src="../assets/js/ao-thun.js"></script>
+<script>
+    const PAGE_CATEGORIES = 'ao-thun'; 
+</script>
+
 
 </body>
 </html>

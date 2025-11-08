@@ -49,6 +49,8 @@
   </section>
 
 <?php include('../footer.php'); ?>
-
+<script>
+    const PAGE_CATEGORIES = 'quan-jogger'; 
+</script>
 </body>
 </html>

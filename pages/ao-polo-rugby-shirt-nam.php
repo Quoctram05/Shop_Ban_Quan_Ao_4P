@@ -35,51 +35,21 @@
   <!-- Danh sách sản phẩm -->
   <section class="product-section section">
     <div class="container">
+    
       <div class="product-grid" id="product-grid">
-        <!-- Ví dụ sản phẩm PO170 -->
-        <div class="product-card">
-          <img src="../assets/img/polo1.jpg" alt="PO170">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Polo Thể Thao Phối Viền PO170</h4>
-          <p><span class="new">345,000₫</span></p>
-        </div>
-        <!-- Thêm các sản phẩm khác theo mẫu -->
-        <div class="product-card">
-          <img src="../assets/img/polo2.jpg" alt="PO169">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Polo Thể Thao PO169</h4>
-          <p><span class="new">315,000₫</span> <span class="old">345,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/polo3.jpg" alt="PO168">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Polo PO168</h4>
-          <p><span class="new">315,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/polo4.jpg" alt="PO167">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Polo PO167</h4>
-          <p><span class="new">395,000₫</span></p>
-        </div>
+        <p>Đang tải sản phẩm, vui lòng chờ...</p>
       </div>
 
-      <!-- Phân trang -->
-      <div class="pagination">
-        <button class="page-btn prev" disabled>&laquo;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn next">&raquo;</button>
-      </div>
+      <div class="pagination" id="pagination-controls">
+        </div>
+
     </div>
   </section>
 
 <?php include('../footer.php'); ?>
+<script>
+    const PAGE_CATEGORIES = ['ao-polo', 'ao-rugby-shirt'];
+</script>
 
 </body>
 </html>

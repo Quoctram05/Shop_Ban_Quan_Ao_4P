@@ -48,6 +48,9 @@
   </section>
   
 <?php include('../footer.php'); ?>
-<script src="../assets/js/ao-len.js"></script>
+<script>
+    const PAGE_CATEGORIES = 'ao-len'; 
+</script>
+
 </body>
 </html>

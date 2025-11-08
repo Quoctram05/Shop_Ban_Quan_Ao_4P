@@ -50,6 +50,9 @@ include('../public/connect.php');
 
 
 <?php include('../footer.php'); ?>
+<script>
+  const PAGE_CATEGORIES = ['ao-hoodie', 'ao-sweatshirt'];
+</script>
 
 </body>
 </html>

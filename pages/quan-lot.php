@@ -35,51 +35,22 @@
   </section>
 
   <!-- Danh sách sản phẩm Quần Lót Nam -->
-  <section class="product-section section">
+    <section class="product-section section">
     <div class="container">
+    
       <div class="product-grid" id="product-grid">
-        <!-- Ví dụ sản phẩm -->
-        <div class="product-card">
-          <img src="../assets/img/sip1.jpg" alt="QL069">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Boxer Lụa Băng Thông Hơi QL069</h4>
-          <p><span class="new">119,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/sip2.jpg" alt="QL068">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Boxer Lụa Băng Phối Lưới QL068</h4>
-          <p><span class="new">119,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/sip3.jpg" alt="QL067">
-          <div class="badge">-10%</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Boxer Đục Lỗ Thoáng Khí QL067</h4>
-          <p><span class="new">107,100₫</span> <span class="old">119,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/sip4.jpg" alt="QL066">
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Boxer Lụa Băng hoàn thiện QL066</h4>
-          <p><span class="new">119,000₫</span></p>
-        </div>
-        <!-- Thêm nhiều sản phẩm nếu cần -->
+        <p>Đang tải sản phẩm, vui lòng chờ...</p>
       </div>
 
-      <!-- Phân trang -->
-      <div class="pagination">
-        <button class="page-btn prev" disabled>&laquo;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn next">&raquo;</button>
-      </div>
+      <div class="pagination" id="pagination-controls">
+        </div>
+
     </div>
   </section>
 
 <?php include('../footer.php'); ?>
+<script>
+    const PAGE_CATEGORIES = 'do-lot'; 
+</script>
 </body>
 </html>

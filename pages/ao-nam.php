@@ -13,10 +13,14 @@
       <div class="filter-group">
         <span>Bộ lọc:</span>
         <select id="filter-type">
-          <option value="all">Tất cả loại áo</option>
-          <option value="polo">Polo</option>
-          <option value="tshirt">Thun</option>
-          <option value="shirt">Sơ mi</option>
+          <option value="ao">Tất cả loại áo</option>
+          <option value="ao-polo">Polo</option>
+          <option value="ao-thun">Thun</option>
+          <option value="ao-so-mi">Sơ mi</option>
+          <option value="ao-khoac">Áo Khoác</option>
+          <option value="ao-hoodie">Hoodie</option>
+          <option value="ao-len">Áo Len</option>
+          <option value="ao-vest">Vest</option>
         </select>
       </div>
       <div class="sort-group">
@@ -46,6 +50,9 @@
   </section>
 
 <?php include('../footer.php'); ?>
-<script src="../assets/js/ao-nam.js"></script>
+<script>
+    const PAGE_CATEGORIES = 'ao'; 
+</script>
+
 </body>
 </html>

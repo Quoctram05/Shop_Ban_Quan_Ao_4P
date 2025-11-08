@@ -51,6 +51,8 @@
   
 <?php include('../footer.php'); ?>
 
-<script src="../assets/js/ao-khoac.js"></script>
+<script>
+    const PAGE_CATEGORIES = 'ao-khoac'; 
+</script>
 </body>
 </html>

@@ -705,3 +705,41 @@ footer {
     content: "\f07a"; /* Unicode cho icon fa-shopping-cart */
     /* Bạn có thể tìm unicode của icon khác tại https://fontawesome.com/v6/icons/ */
 }
+
+/* Mác giảm giá (ví dụ: -10%) */
+.badge-sale {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: #333; /* Màu đen */
+    color: #fff;
+    padding: 5px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    z-index: 2; /* Nằm trên ảnh */
+}
+
+/* Giá mới (màu đỏ, giống ảnh của bạn) */
+.product-card .price .new-price {
+    color: #f44336; /* Màu đỏ */
+    font-weight: 600;
+    font-size: 16px;
+}
+
+/* Giá cũ (bị gạch ngang) */
+.product-card .price .old-price {
+    color: #999;
+    text-decoration: line-through; /* Gạch ngang */
+    font-size: 14px;
+    margin-left: 8px; /* Khoảng cách với giá mới */
+}
+
+.product-card h4 {
+    /* (Các thuộc tính cũ của bạn như font-size, color... giữ nguyên) */
+
+    /* Thêm 3 dòng này vào: */
+    white-space: nowrap;      /* 1. Ngăn không cho text xuống dòng */
+    overflow: hidden;         /* 2. Ẩn phần text bị tràn ra ngoài */
+    text-overflow: ellipsis;  /* 3. Thêm dấu "..." vào cuối */
+}

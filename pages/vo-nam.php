@@ -34,51 +34,22 @@
   </section>
 
   <!-- Các sản phẩm vớ -->
-  <section class="product-section section">
+    <section class="product-section section">
     <div class="container">
+    
       <div class="product-grid" id="product-grid">
-        <!-- Ví dụ sản phẩm -->
-        <div class="product-card">
-          <img src="../assets/img/vo1.jpg" alt="VO063" />
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Vớ Nam cổ dài VO063</h4>
-          <p><span class="new">45,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/vo2.jpg" alt="VO061" />
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Vớ Nam cổ cao VO061</h4>
-          <p><span class="new">45,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/vo3.jpg" alt="VO058" />
-          <div class="badge">-10%</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Vớ Nam VO058</h4>
-          <p><span class="new">31,500₫</span> <span class="old">35,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/vo4.jpg" alt="VO053" />
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Vớ Nam cổ ngắn VO053</h4>
-          <p><span class="new">35,000₫</span></p>
-        </div>
+        <p>Đang tải sản phẩm, vui lòng chờ...</p>
       </div>
 
-      <!-- Phân trang -->
-      <div class="pagination">
-        <button class="page-btn prev" disabled>&laquo;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn next">&raquo;</button>
-      </div>
+      <div class="pagination" id="pagination-controls">
+        </div>
+
     </div>
   </section>
 
-  <?php include('../footer.php'); ?>
+<?php include('../footer.php'); ?>
+<script>
+    const PAGE_CATEGORIES = 'vo-tat'; 
+</script>
 </body>
 </html>

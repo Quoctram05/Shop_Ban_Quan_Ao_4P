@@ -43,7 +43,10 @@
   include('../footer.php'); 
 ?>
 
-<script src="../assets/js/ao-so-mi.js"></script>
+<script>
+    const PAGE_CATEGORIES = 'ao-so-mi'; 
+</script>
+
 
 </body>
 </html>

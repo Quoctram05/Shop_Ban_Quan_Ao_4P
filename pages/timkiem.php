@@ -1,63 +1,60 @@
 <?php
-include('../public/connect.php');
+include('../header.php'); 
+include('../navbar.php');
 
+// Lấy query tìm kiếm từ URL (q=...)
 $q = $_GET['q'] ?? '';
 $q = trim($q);
-
-// Prepared statement để tìm theo product.name
-$stmt = $conn->prepare("
-  SELECT
-    p.id,
-    p.name,
-    -- Lấy ảnh chính nếu có (view đã có sẵn trong DB)
-    (SELECT vi.main_image FROM v_product_main_image vi WHERE vi.product_id = p.id) AS main_image,
-    -- Lấy giá thấp nhất trong các biến thể nếu có
-    (SELECT MIN(vp.final_price) FROM v_variant_pricing vp WHERE vp.product_id = p.id) AS min_price,
-    (SELECT MAX(vp.compare_at_price) FROM v_variant_pricing vp WHERE vp.product_id = p.id) AS max_compare
-  FROM product p
-  WHERE p.name LIKE CONCAT('%', ?, '%')
-  ORDER BY p.updated_at DESC, p.created_at DESC
-");
-$stmt->bind_param("s", $q);
-$stmt->execute();
-$res = $stmt->get_result();
 ?>
-<!DOCTYPE html>
-<html lang="vi">
-<head>
-  <meta charset="UTF-8">
-  <title>Kết quả tìm kiếm - 4MEN</title>
-  <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body>
-  <h2 style="text-align:center; margin:30px 0;">
-    Kết quả tìm kiếm cho: <span style="color:#b35d2a;"><?php echo htmlspecialchars($q); ?></span>
-  </h2>
 
-  <div class="container">
-    <div class="product-grid">
-      <?php if ($res->num_rows): ?>
-        <?php while ($row = $res->fetch_assoc()): ?>
-          <div class="product-card">
-            <img src="<?php echo $row['main_image'] ? '..'.$row['main_image'] : '../assets/img/ao1.jpg'; ?>"
-                 alt="<?php echo htmlspecialchars($row['name']); ?>">
-            <h4><?php echo htmlspecialchars($row['name']); ?></h4>
-            <?php if ($row['min_price']): ?>
-              <p>
-                <span class="new"><?php echo number_format($row['min_price'], 0, ',', '.'); ?>đ</span>
-                <?php if ($row['max_compare'] && $row['max_compare'] > $row['min_price']): ?>
-                  <span class="old"><?php echo number_format($row['max_compare'], 0, ',', '.'); ?>đ</span>
-                <?php endif; ?>
-              </p>
-            <?php else: ?>
-              <p><span class="new">Giá đang cập nhật</span></p>
-            <?php endif; ?>
-          </div>
-        <?php endwhile; ?>
-      <?php else: ?>
-        <p style="grid-column: 1/-1; text-align:center;">Không tìm thấy sản phẩm nào phù hợp.</p>
-      <?php endif; ?>
+<section class="breadcrumb">
+    <div class="container">
+      <p>4MEN / Tìm kiếm</p>
     </div>
-  </div>
+</section>
+
+<section class="filter-bar">
+    <div class="container">
+      <div class="sort-group">
+        <span>Sắp xếp:</span>
+        <select id="sort-select">
+          <option value="default">Mới nhất</option>
+          <option value="price-desc">Giá giảm dần</option>
+          <option value="price-asc">Giá tăng dần</option>
+        </select>
+      </div>
+    </div>
+</section>
+
+<section class="product-section section">
+    <div class="container">
+        
+        <h2 style="text-align:center; margin-bottom:30px;">
+        Kết quả tìm kiếm cho: <span style="color:#b35d2a;"><?php echo htmlspecialchars($q); ?></span>
+        </h2>
+    
+      <div class="product-grid" id="product-grid">
+        <p>Đang tải sản phẩm, vui lòng chờ...</p>
+      </div>
+
+      <div class="pagination" id="pagination-controls">
+      </div>
+
+    </div>
+</section>
+
+<?php include('../footer.php'); ?>
+
+<script>
+    // 1. (KHÔNG cần PAGE_CATEGORIES)
+    // 2. (KHÔNG cần IS_SALE_PAGE)
+    
+    // 3. Định nghĩa biến query tìm kiếm cho JS
+    // (Dùng json_encode để xử lý các ký tự đặc biệt như ' " &)
+    const PAGE_SEARCH_QUERY = <?php echo json_encode($q); ?>; 
+</script>
+
+<script src="../assets/js/product-list.js"></script>
+
 </body>
 </html>

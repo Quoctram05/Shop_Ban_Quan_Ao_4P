@@ -154,3 +154,46 @@
       restartCycle(); // reset thời gian + thanh tiến trình
     });
   });
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // Tìm ô tìm kiếm và ô chứa gợi ý (bạn cần tự tạo ô #search-suggestions)
+    const searchInput = document.querySelector('.search-form input[name="q"]');
+    const suggestionsBox = document.getElementById('search-suggestions'); // Ví dụ: <div id="search-suggestions"></div>
+
+    if (searchInput && suggestionsBox) {
+        
+        searchInput.addEventListener('input', async (e) => {
+            const query = e.target.value.trim();
+            
+            if (query.length > 1) {
+                // Gọi API gợi ý (đường dẫn này giả sử bạn ở trang /pages/ao-nam.php)
+                const response = await fetch(`../public/search_suggestion.php?q=${query}`);
+                const suggestions = await response.json();
+                
+                // Hiển thị gợi ý
+                showSuggestions(suggestions);
+            } else {
+                // Ẩn gợi ý
+                suggestionsBox.innerHTML = '';
+                suggestionsBox.style.display = 'none';
+            }
+        });
+    }
+
+    function showSuggestions(suggestions) {
+        if (suggestions.length > 0) {
+            let listHTML = '<ul>';
+            suggestions.forEach(item => {
+                // Tạo link để người dùng nhấp vào
+                listHTML += `<li><a href="timkiem.php?q=${item}">${item}</a></li>`;
+            });
+            listHTML += '</ul>';
+            
+            suggestionsBox.innerHTML = listHTML;
+            suggestionsBox.style.display = 'block';
+        } else {
+            suggestionsBox.innerHTML = '';
+            suggestionsBox.style.display = 'none';
+        }
+    }
+});

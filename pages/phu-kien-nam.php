@@ -53,6 +53,8 @@
   </section>
 
 <?php include('../footer.php'); ?>
-
+<script>
+    const PAGE_CATEGORIES = 'phu-kien'; 
+</script>
 </body>
 </html>

@@ -34,39 +34,22 @@
   </section>
 
   <!-- Sản phẩm Túi Xách Nam -->
-  <section class="product-section section">
+    <section class="product-section section">
     <div class="container">
+    
       <div class="product-grid" id="product-grid">
-        <!-- Ví dụ các sản phẩm -->
-        <div class="product-card">
-          <img src="../assets/img/tx1.jpg" alt="TX018" />
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Túi Xách Jean TX018</h4>
-          <p><span class="new">175,000₫</span></p>
-        </div>
-        <div class="product-card">
-          <img src="../assets/img/tx2.jpg" alt="TX014" />
-          <div class="badge">New</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Túi Bao Tử Casual TX014</h4>
-          <p><span class="new">285,000₫</span></p>
-        </div>
-        <!-- bạn có thể thêm các sản phẩm khác theo mẫu -->
+        <p>Đang tải sản phẩm, vui lòng chờ...</p>
       </div>
 
-      <!-- Phân trang -->
-      <div class="pagination">
-        <button class="page-btn prev" disabled>&laquo;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn next">&raquo;</button>
-      </div>
+      <div class="pagination" id="pagination-controls">
+        </div>
+
     </div>
   </section>
 
 <?php include('../footer.php'); ?>/div>
-  </footer>
+<script>
+    const PAGE_CATEGORIES = 'tui-xach'; 
+</script>
 </body>
 </html>

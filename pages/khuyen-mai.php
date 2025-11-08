@@ -26,55 +26,22 @@
   <!-- Sản phẩm khuyến mãi -->
   <section class="product-section section">
     <div class="container">
+    
       <div class="product-grid" id="product-grid">
-        <!-- Ví dụ sản phẩm khuyến mãi -->
-        <div class="product-card">
-          <img src="../assets/img/km1.jpg" alt="Sản phẩm KM 1">
-          <div class="badge">-10%</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Short QS080</h4>
-          <p><span class="new">284,000₫</span> <span class="old">315,000₫</span></p>
-        </div>
-
-        <div class="product-card">
-          <img src="../assets/img/km2.jpg" alt="Sản phẩm KM 2">
-          <div class="badge">-10%</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Short QS079</h4>
-          <p><span class="new">284,000₫</span> <span class="old">315,000₫</span></p>
-        </div>
-
-        <div class="product-card">
-          <img src="../assets/img/km3.jpg" alt="Sản phẩm KM 3">
-          <div class="badge">-10%</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Polo PO170</h4>
-          <p><span class="new">311,000₫</span> <span class="old">345,000₫</span></p>
-        </div>
-
-        <div class="product-card">
-          <img src="../assets/img/km4.jpg" alt="Sản phẩm KM 4">
-          <div class="badge">-10%</div>
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Polo PO169</h4>
-          <p><span class="new">284,000₫</span> <span class="old">315,000₫</span></p>
-        </div>
-
-        <!-- bạn có thể thêm nhiều sản phẩm khuyến mãi hơn -->
+        <p>Đang tải sản phẩm, vui lòng chờ...</p>
       </div>
 
-      <!-- Phân trang -->
-      <div class="pagination">
-        <button class="page-btn prev" disabled>&laquo;</button>
-        <button class="page-btn active">1</button>
-        <button class="page-btn">2</button>
-        <button class="page-btn">3</button>
-        <button class="page-btn next">&raquo;</button>
-      </div>
+      <div class="pagination" id="pagination-controls">
+        </div>
+
     </div>
   </section>
 
 <?php include('../footer.php'); ?>
+<script>
+    const IS_SALE_PAGE = true; 
+</script>
 
+<script src="../assets/js/product-list.js"></script>
 </body>
 </html>
