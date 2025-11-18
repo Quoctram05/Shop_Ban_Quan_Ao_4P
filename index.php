@@ -40,58 +40,16 @@ include('public/connect.php');
   <section class="section">
     <div class="container">
       <h2>THỜI TRANG HOT NHẤT</h2>
-      <div class="product-grid">
-        <div class="product-card">
-          <img src="assets/img/ao1.jpg" alt="">
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Polo P0137</h4>
-          <p><span class="new">249,000đ</span> <span class="old">345,000đ</span></p>
-        </div>
-        <div class="product-card">
-          <img src="assets/img/ao3.jpg" alt="">
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Khoác Bomber</h4>
-          <p><span class="new">319,000đ</span> <span class="old">445,000đ</span></p>
-        </div>
-        <div class="product-card">
-          <img src="assets/img/ao2.jpg" alt="">
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Tây Slimfit</h4>
-          <p><span class="new">349,000đ</span> <span class="old">425,000đ</span></p>
-        </div>
-        <div class="product-card">
-          <img src="assets/img/ao4.jpg" alt="">
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Thun Basic</h4>
-          <p><span class="new">275,000đ</span> <span class="old">345,000đ</span></p>
-        </div>
+      <div class="product-grid" id="hot-products-grid">
+         <p style="text-align:center; width:100%">Đang tải sản phẩm hot...</p>
       </div>
     </div>
   </section>
 
-  <section class="collection-preview">
+<section class="collection-preview">
   <div class="container">
-    <div class="collection-grid">
-      <!-- Item 1 -->
-      <div class="collection-item">
-        <img src="assets/img/ao1.jpg" alt="POLO">
-        <div class="overlay"></div>
-        <h3>POLO</h3>
-      </div>
-
-      <!-- Item 2 -->
-      <div class="collection-item">
-        <img src="assets/img/ao2.jpg" alt="NEW ARRIVALS">
-        <div class="overlay"></div>
-        <h3>NEW ARRIVALS</h3>
-      </div>
-
-      <!-- Item 3 -->
-      <div class="collection-item">
-        <img src="assets/img/ao3.jpg" alt="ÁO THUN">
-        <div class="overlay"></div>
-        <h3>ÁO THUN</h3>
-      </div>
+    <div class="collection-grid" id="collection-grid">
+       <p style="text-align:center; width:100%">Đang tải bộ sưu tập...</p>
     </div>
   </div>
 </section>
@@ -101,34 +59,12 @@ include('public/connect.php');
   <section class="section">
     <div class="container">
       <h2>THỜI TRANG MỚI NHẤT </h2>
-      <div class="product-grid">
-        <div class="product-card">
-          <img src="assets/img/ao1.jpg" alt="">
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Polo P0137</h4>
-          <p><span class="new">249,000đ</span> <span class="old">345,000đ</span></p>
+        <div class="product-grid" id="new-products-grid">
+         <p style="text-align:center; width:100%">Đang tải sản phẩm mới...</p>
         </div>
-        <div class="product-card">
-          <img src="assets/img/ao3.jpg" alt="">
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Khoác Bomber</h4>
-          <p><span class="new">319,000đ</span> <span class="old">445,000đ</span></p>
-        </div>
-        <div class="product-card">
-          <img src="assets/img/ao2.jpg" alt="">
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Tây Slimfit</h4>
-          <p><span class="new">349,000đ</span> <span class="old">425,000đ</span></p>
-        </div>
-        <div class="product-card">
-          <img src="assets/img/ao4.jpg" alt="">
-          <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Thun Basic</h4>
-          <p><span class="new">275,000đ</span> <span class="old">345,000đ</span></p>
-        </div>
-      </div>
     </div>
   </section>
   <?php include('footer.php'); ?>
+  <script src="assets/js/home.js"></script>
 </body>
 </html>
