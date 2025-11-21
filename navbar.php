@@ -85,14 +85,25 @@
 </div>
 
 
-    <div class="icons">
-  <a href="<?php echo $base_url; ?>login.php">
-    <i class="fa-regular fa-user"></i>
-  </a>
-  <a href="<?php echo $base_url; ?>pages/giohang.php" class="cart">
-    <i class="fa-solid fa-cart-shopping"></i>
-    <span class="count">2</span>
-  </a>
-</div>
+  <div class="icons">
+      <a href="<?php echo $base_url; ?>login.php">
+          <i class="fa-regular fa-user"></i>
+      </a>
+      
+      <div class="cart-wrapper" style="position: relative; display: inline-block;">
+          
+          <a href="<?php echo $base_url; ?>pages/thanhtoan.php" class="cart" id="header-cart-btn">
+              <i class="fa-solid fa-cart-shopping"></i>
+              <span class="count" id="header-cart-count">0</span>
+          </a>
+
+          <div class="mini-cart-box" id="mini-cart-dropdown">
+              <div class="cart-content">
+                  <p style="padding: 10px; text-align: center;">Đang tải...</p>
+              </div>
+          </div>
+
+      </div>
+  </div>
   </div>
 </header>

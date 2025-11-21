@@ -25,6 +25,6 @@
   </div>
   <div class="copy">© 2025 4MEN SHOP. All rights reserved.</div>
 </footer>
-
+<script src="<?php echo $base_url; ?>assets/js/cart.js"></script>
 </body>
 </html>

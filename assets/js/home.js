@@ -1,48 +1,33 @@
 document.addEventListener('DOMContentLoaded', () => {
 
-    // ==============================================
-    // CẤU HÌNH CHUNG
-    // ==============================================
-    const ITEMS_LIMIT = 4; // Số lượng sản phẩm hiển thị (4 hoặc 8)
+    const ITEMS_LIMIT = 4;
 
-    // Cấu hình các Bộ Sưu Tập (Tiêu đề, Link, và Cách lấy ảnh đại diện)
+    // Cấu hình các Bộ Sưu Tập
     const collectionsConfig = [
         {
             title: "POLO",
             link: "pages/ao-polo-rugby-shirt-nam.php", 
-            apiQuery: "category=ao-polo&sort=default" // Lấy áo polo mới nhất
+            apiQuery: "category=ao-polo&sort=default"
         },
         {
             title: "NEW ARRIVALS",
-            link: "pages/hang-moi-ve.php", 
-            apiQuery: "sort=default" // Lấy sản phẩm mới nhất bất kỳ
+            link: "pages/thoi-trang-moi-nhat.php", 
+            apiQuery: "sort=default" 
         },
         {
             title: "ÁO THUN",
             link: "pages/ao-thun.php",
-            apiQuery: "category=ao-thun&sort=default" // Lấy áo thun mới nhất
+            apiQuery: "category=ao-thun&sort=default"
         }
     ];
 
-
-    // ==============================================
-    // 1. KHỞI CHẠY CÁC HÀM TẢI DỮ LIỆU
-    // ==============================================
-
-    // 1.1. Tải sản phẩm HOT (Ví dụ: Sắp xếp giá giảm dần)
-    // Lưu ý: Dùng đường dẫn 'api/products.php' (không có ../) vì đang ở index.php
+    // 1. Gọi hàm tải dữ liệu
     fetchHomeProducts('api/products.php?sort=price-desc&page=1', 'hot-products-grid');
-
-    // 1.2. Tải sản phẩm MỚI NHẤT
     fetchHomeProducts('api/products.php?sort=default&page=1', 'new-products-grid');
-
-    // 1.3. Tải Bộ Sưu Tập
     loadCollections(collectionsConfig, 'collection-grid');
 
 
-    // ==============================================
-    // 2. ĐỊNH NGHĨA HÀM XỬ LÝ SẢN PHẨM (HOT/MỚI)
-    // ==============================================
+    // 2. Hàm xử lý Sản phẩm
     async function fetchHomeProducts(apiUrl, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
@@ -52,51 +37,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const data = await response.json();
 
             if (data.products && data.products.length > 0) {
-                container.innerHTML = ''; // Xóa chữ "Đang tải..."
+                container.innerHTML = '';
 
-                // Chỉ lấy số lượng giới hạn (ví dụ 4 sản phẩm)
                 const productsToShow = data.products.slice(0, ITEMS_LIMIT);
 
                 productsToShow.forEach(product => {
-                    // --- A. Logic Tính Giá & Mác Giảm Giá ---
+                    // Logic tính giá
                     const displayPrice = Number(product.display_price);
                     const originalPrice = Number(product.original_price);
                     let priceHTML = '';
                     let badgeHTML = '';
 
                     if (originalPrice > (displayPrice + 1000)) {
-                        // Có giảm giá
                         const formattedDisplay = displayPrice.toLocaleString('vi-VN');
                         const formattedOriginal = originalPrice.toLocaleString('vi-VN');
-                        
                         let discountPercent = 0;
                         if (originalPrice > 0) {
                             discountPercent = Math.round(((originalPrice - displayPrice) / originalPrice) * 100);
                         }
-
                         badgeHTML = `<div class="badge-sale">-${discountPercent}%</div>`;
-                        priceHTML = `
-                            <p class="price">
-                                <span class="new-price">${formattedDisplay}₫</span>
-                                <span class="old-price">${formattedOriginal}₫</span>
-                            </p>`;
+                        priceHTML = `<p class="price"><span class="new-price">${formattedDisplay}đ</span> <span class="old-price">${formattedOriginal}đ</span></p>`;
                     } else {
-                        // Không giảm giá
                         const formattedDisplay = displayPrice.toLocaleString('vi-VN');
-                        priceHTML = `
-                            <p class="price">
-                                <span class="new-price">${formattedDisplay}₫</span>
-                            </p>`;
+                        priceHTML = `<p class="price"><span class="new-price">${formattedDisplay}đ</span></p>`;
                     }
 
-                    // --- B. Xử lý đường dẫn (Quan trọng cho index.php) ---
-                    // 1. Link chi tiết: Phải đi vào thư mục pages/
                     const linkDetail = `pages/chi-tiet.php?slug=${product.slug}`;
-                    
-                    // 2. Link ảnh: Xóa dấu '../' ở đầu vì index.php nằm ở gốc
                     let cleanImage = product.image_url ? product.image_url.replace(/^\.\.\//, '') : 'assets/img/no-image.jpg';
 
-                    // --- C. Vẽ HTML ---
+                    // Thêm class add-to-cart-btn và data attributes
                     const html = `
                         <div class="product-card">
                             <a href="${linkDetail}">
@@ -104,7 +73,12 @@ document.addEventListener('DOMContentLoaded', () => {
                             </a>
                             ${badgeHTML}
                             <div class="overlay">
-                                <button onclick="window.location.href='${linkDetail}'"></button>
+                                <button class="add-to-cart-btn" 
+                                    data-id="${product.id}" 
+                                    data-name="${product.ten_san_pham}" 
+                                    data-price="${displayPrice}" 
+                                    data-image="${cleanImage}">
+                                </button>
                             </div>
                             <h4><a href="${linkDetail}">${product.ten_san_pham}</a></h4>
                             ${priceHTML}
@@ -114,58 +88,41 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
 
             } else {
-                container.innerHTML = '<p>Đang cập nhật sản phẩm...</p>';
+                container.innerHTML = '<p>Đang cập nhật...</p>';
             }
 
         } catch (error) {
             console.error(`Lỗi tải mục ${containerId}:`, error);
-            container.innerHTML = '<p>Lỗi kết nối server.</p>';
         }
     }
 
-
-    // ==============================================
-    // 3. ĐỊNH NGHĨA HÀM XỬ LÝ BỘ SƯU TẬP
-    // ==============================================
+    // 3. Hàm xử lý Bộ Sưu Tập
     async function loadCollections(items, containerId) {
         const container = document.getElementById(containerId);
         if (!container) return;
         
-        container.innerHTML = ''; // Xóa loading
+        container.innerHTML = ''; 
 
-        // Duyệt qua từng cấu hình bộ sưu tập
         for (const item of items) {
             try {
-                // Gọi API lấy đúng 1 sản phẩm đại diện
                 const response = await fetch(`api/products.php?${item.apiQuery}&page=1`);
                 const data = await response.json();
-
-                let imageUrl = 'assets/img/default.jpg'; // Ảnh mặc định
+                let imageUrl = 'assets/img/default.jpg'; 
                 
                 if (data.products && data.products.length > 0) {
-                    // Lấy ảnh sản phẩm đầu tiên
                     let rawImg = data.products[0].image_url;
-                    // Xử lý đường dẫn ảnh cho index.php
-                    if (rawImg) {
-                        imageUrl = rawImg.replace(/^\.\.\//, ''); 
-                    }
+                    if (rawImg) imageUrl = rawImg.replace(/^\.\.\//, ''); 
                 }
 
-                // Vẽ HTML cho 1 ô Collection
                 const html = `
                     <div class="collection-item">
-                        <a href="${item.link}">
-                            <img src="${imageUrl}" alt="${item.title}">
-                        </a>
+                        <a href="${item.link}"><img src="${imageUrl}" alt="${item.title}"></a>
                         <div class="overlay"></div>
                         <h3><a href="${item.link}">${item.title}</a></h3>
                     </div>
                 `;
                 container.innerHTML += html;
-
-            } catch (error) {
-                console.error(`Lỗi tải collection ${item.title}:`, error);
-            }
+            } catch (error) { console.error(`Lỗi tải collection:`, error); }
         }
     }
 
