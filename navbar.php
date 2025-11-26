@@ -1,3 +1,4 @@
+
 <header class="main-header">
   <div class="container">
     <div class="logo">
@@ -74,36 +75,58 @@
       </ul>
     </nav>
 
-    <div class="search-box" style="position: relative;">
-  <form action="<?php echo $base_url; ?>pages/timkiem.php" method="GET">
-    <input type="text" id="search" name="q" placeholder="Tìm sản phẩm..." autocomplete="off">
-    <button type="submit" style="background:none;border:none;cursor:pointer;">
-      <i class="fa-solid fa-magnifying-glass"></i>
-    </button>
-  </form>
-  <div id="suggestions"></div>
-</div>
+    <div class="header-actions">
 
-
-  <div class="icons">
-      <a href="<?php echo $base_url; ?>login.php">
-          <i class="fa-regular fa-user"></i>
-      </a>
-      
-      <div class="cart-wrapper" style="position: relative; display: inline-block;">
-          
-          <a href="<?php echo $base_url; ?>pages/thanhtoan.php" class="cart" id="header-cart-btn">
-              <i class="fa-solid fa-cart-shopping"></i>
-              <span class="count" id="header-cart-count">0</span>
-          </a>
-
-          <div class="mini-cart-box" id="mini-cart-dropdown">
-              <div class="cart-content">
-                  <p style="padding: 10px; text-align: center;">Đang tải...</p>
-              </div>
-          </div>
-
+      <div class="search-box">
+          <form action="<?php echo $base_url; ?>pages/timkiem.php" method="GET">
+              <input type="text" id="search" name="q" class="search-input" placeholder="Tìm kiếm..." autocomplete="off">
+              
+              <button type="submit" class="search-btn">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+              </button>
+          </form>
+          <div id="suggestions"></div>
+      </div> 
+      <div class="cart-wrapper">
+        <a href="<?php echo $base_url; ?>pages/thanhtoan.php" class="cart" id="header-cart-btn">
+            <div class="cart-icon-box">
+                <i class="fa-solid fa-cart-shopping"></i>
+                <span class="count" id="header-cart-count">0</span>
+            </div>
+        </a>
+        <div class="mini-cart-box" id="mini-cart-dropdown">
+            <div class="cart-content">
+                <p style="padding: 10px; text-align: center;">Đang tải...</p>
+            </div>
+        </div>
       </div>
-  </div>
+        <?php if (isset($_SESSION['user_id'])): ?>
+            <div class="user-menu">
+                <a href="<?php echo $base_url; ?>pages/profile.php">
+                    <div class="user-icon-box">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <div class="user-info">
+                        <span class="user-name">
+                            <?php echo htmlspecialchars($_SESSION['user_name'] ?? 'Tài khoản'); ?>
+                        </span>
+                        <span class="user-role">
+                            <?php 
+                                $role = $_SESSION['user_role'] ?? '';
+                                echo ($role === 'QuanTriVien') ? 'Quản trị viên' : 'Thành viên';
+                            ?>
+                        </span>
+                    </div>
+                </a>
+            </div>
+        <?php else: ?>
+            <a href="<?php echo $base_url; ?>login.php" class="icon-btn">
+                <div class="user-icon-box">
+                    <i class="fa-regular fa-user"></i>
+                </div>
+            </a>
+        <?php endif; ?>
+      </div>
+    </div>
   </div>
 </header>

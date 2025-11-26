@@ -1,341 +1,271 @@
+<?php
+declare(strict_types=1);
+
+// Cấu hình Cookie bảo mật
+$secureCookie = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+session_set_cookie_params([
+    'httponly' => true,
+    'samesite' => 'Lax',
+    'secure' => $secureCookie,
+    'path' => '/',
+]);
+session_start();
+
+// === HÀM TIỆN ÍCH (GIỮ NGUYÊN) ===
+function client_ip(): string {
+    $keys = ['HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR'];
+    foreach ($keys as $key) {
+        if (!empty($_SERVER[$key])) {
+            $parts = explode(',', (string)$_SERVER[$key]);
+            $ip = trim($parts[0]);
+            if ($ip !== '') return $ip;
+        }
+    }
+    return '0.0.0.0';
+}
+
+function csrf_token(): string {
+    if (empty($_SESSION['csrf'])) $_SESSION['csrf'] = bin2hex(random_bytes(32));
+    return (string)$_SESSION['csrf'];
+}
+
+// === KẾT NỐI CSDL (SỬA LẠI ĐƯỜNG DẪN CHO ĐÚNG) ===
+// Giả sử file connect.php nằm ở public/connect.php
+require_once __DIR__ . '/public/connect.php';
+// Biến kết nối là $conn (PDO) đã có sẵn từ file connect.php
+
+$errorMessage = '';
+$successMessage = '';
+$csrfToken = csrf_token();
+
+if (isset($_SESSION['register_success'])) {
+    $successMessage = (string)$_SESSION['register_success'];
+    unset($_SESSION['register_success']);
+}
+
+// === XỬ LÝ ĐĂNG NHẬP ===
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Kiểm tra CSRF
+    if (!hash_equals($_SESSION['csrf'] ?? '', (string)($_POST['csrf'] ?? ''))) {
+        $errorMessage = 'Phiên đăng nhập không hợp lệ. Vui lòng tải lại trang.';
+    } else {
+        $email = trim((string)($_POST['email'] ?? '')); // Sửa: Đăng nhập bằng Email
+        $password = (string)($_POST['password'] ?? '');
+
+        // Tìm người dùng trong bảng nguoi_dung
+        try {
+            $stmt = $conn->prepare('SELECT id, ho_ten, mat_khau, email, vai_tro FROM nguoi_dung WHERE email = ? LIMIT 1');
+            $stmt->execute([$email]);
+            $user = $stmt->fetch();
+        } catch (Exception $e) {
+            $user = null;
+        }
+
+        if (!$user) {
+            $errorMessage = 'Email hoặc mật khẩu không đúng.';
+        } else {
+            // Kiểm tra mật khẩu (Giả sử mật khẩu đã hash bằng password_hash)
+            // Nếu trong DB bạn đang lưu mật khẩu thường (chưa hash) để test thì dùng: if ($password === $user['mat_khau'])
+            if (password_verify($password, $user['mat_khau'])) {
+                
+                // Đăng nhập thành công -> Lưu Session
+                session_regenerate_id(true);
+                $_SESSION['user_id'] = (int)$user['id'];
+                $_SESSION['user_name'] = $user['ho_ten'];
+                $_SESSION['user_email'] = $user['email'];
+                $_SESSION['user_role'] = $user['vai_tro']; // 'KhachHang' hoặc 'QuanTriVien'
+
+                // Chuyển hướng dựa trên vai trò
+                if ($user['vai_tro'] === 'QuanTriVien') {
+                    header('Location: admin/index.php');
+                } else {
+                    header('Location: index.php');
+                }
+                exit;
+            } else {
+                $errorMessage = 'Email hoặc mật khẩu không đúng.';
+            }
+        }
+    }
+}
+
+$page_title = 'Đăng Nhập - 4MEN Shop';
+?>
 <!DOCTYPE html>
 <html lang="vi">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng Nhập | 4MEN Shop</title>
-    <!-- Google Fonts: Montserrat -->
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
-
+    <title><?php echo htmlspecialchars($page_title); ?></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
-        /* CSS Reset and Basic Setup */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        /* === TÔNG MÀU 4MEN (CAM ĐẤT) === */
+        :root {
+            --primary-color: #b35d2a;
+            --primary-light: #fff7ed;
+            --primary-dark: #9a3412;
+        }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            overflow: hidden; 
         }
 
-        body {
-            font-family: 'Montserrat', sans-serif;
-            /* Nền be đậm trơn */
-            background-color: #d1c6b8; /* Màu nền chính */
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            overflow: hidden; /* Ngăn scroll và ẩn các phần tử bay ra ngoài */
+        /* Hiệu ứng nền Canvas (Màu cam nhẹ) */
+        #pills-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; 
+            background: linear-gradient(to bottom, #fff7ed, #ffedd5);
         }
 
-        /* Wrapper chính cho toàn bộ trang */
-        .login-page-wrapper {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+        /* Animation form bay lên */
+        @keyframes fadeInUpAndGrow {
+            from { opacity: 0; transform: translateY(30px) scale(0.95); filter: blur(5px); }
+            to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+        }
+
+        .login-card-animation {
+            animation: fadeInUpAndGrow 0.9s ease-out forwards;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .login-card-animation:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(179, 93, 42, 0.15);
         }
         
-        /* === HIỆU ỨNG MỚI: ĐOM ĐÓM === */
-        .fireflies {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-            z-index: 0;
+        /* Nút bấm */
+        .login-button {
+            transition: all 0.3s;
+            background-color: var(--primary-color);
+            color: white; font-weight: 600; border-radius: 0.5rem;
+            box-shadow: 0 4px 14px 0 rgba(179, 93, 42, 0.25);
         }
-
-        .firefly {
-            position: absolute;
-            width: 6px;
-            height: 6px;
-            background: #fff7b5;
-            border-radius: 50%;
-            box-shadow: 0 0 8px 3px #fff7b5, 0 0 14px 5px #ffc107;
-            animation: flicker linear infinite;
-            opacity: 0;
+        .login-button:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px 0 rgba(179, 93, 42, 0.35);
         }
         
-        @keyframes flicker {
-            0%, 100% {
-                opacity: 0;
-                transform: scale(0.8) translate(0, 0);
-            }
-            10%, 90% {
-                 opacity: 1;
-            }
-            50% {
-                opacity: 0.7;
-                transform: scale(1.1) translate(15px, -15px);
-            }
+        /* Input */
+        .login-input {
+            transition: all 0.2s;
+            border: 1px solid #D1D5DB; width: 100%; border-radius: 0.5rem;
+            padding: 0.75rem 1rem; padding-left: 2.5rem; /* Chừa chỗ cho icon */
+            background-color: rgba(255, 255, 255, 0.8);
         }
-        /* === KẾT THÚC HIỆU ỨNG ĐOM ĐÓM === */
-
-
-        /* Nền với các icon bay lơ lửng */
-        .animated-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 1;
-        }
-
-        /* Style cho từng icon bay */
-        .flying-item {
-            position: absolute;
-            /* CẬP NHẬT: Tăng cường hiệu ứng phát sáng */
-            color: rgba(176, 97, 75, 0.25);
-            bottom: -150px;
-            animation: fly 20s linear infinite;
-            user-select: none;
-            transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-            /* CẬP NHẬT: Thêm nhiều lớp shadow để sáng rực rỡ hơn */
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.4),
-                         0 0 25px rgba(176, 97, 75, 0.5),
-                         0 0 45px rgba(176, 97, 75, 0.3);
-        }
-
-        /* Thiết lập ngẫu nhiên cho vị trí, tốc độ, kích thước của các icon */
-        .flying-item:nth-child(1) { left: 10%; animation-duration: 25s; font-size: 80px; }
-        .flying-item:nth-child(2) { left: 20%; animation-duration: 17s; animation-delay: 2s; font-size: 120px; }
-        .flying-item:nth-child(3) { left: 30%; animation-duration: 32s; animation-delay: 4s; font-size: 60px; }
-        .flying-item:nth-child(4) { left: 40%; animation-duration: 20s; animation-delay: 1s; font-size: 90px; }
-        .flying-item:nth-child(5) { left: 50%; animation-duration: 24s; animation-delay: 5s; font-size: 70px; }
-        .flying-item:nth-child(6) { left: 60%; animation-duration: 30s; animation-delay: 3s; font-size: 110px; }
-        .flying-item:nth-child(7) { left: 70%; animation-duration: 18s; animation-delay: 6s; font-size: 50px; }
-        .flying-item:nth-child(8) { left: 80%; animation-duration: 28s; animation-delay: 2s; font-size: 100px; }
-        .flying-item:nth-child(9) { left: 90%; animation-duration: 21s; animation-delay: 4s; font-size: 85px; }
-        .flying-item:nth-child(10){ left: 5%;  animation-duration: 26s; animation-delay: 7s; font-size: 95px; }
-
-        /* Keyframes cho animation bay */
-        @keyframes fly {
-            0% {
-                transform: translateY(0) rotate(0deg);
-                opacity: 1;
-            }
-            100% {
-                transform: translateY(-120vh) rotate(720deg);
-                opacity: 0;
-            }
-        }
-
-        /* Container cho form đăng nhập */
-        .login-container {
-            position: relative;
-            z-index: 2;
-            width: 100%;
-            max-width: 420px;
-            padding: 45px;
-            background: rgba(255, 255, 255, 0.9); /* Màu trắng chủ đạo, trong hơn chút */
-            border-radius: 20px;
-            /* Hiệu ứng shadow màu nâu terracotta */
-            box-shadow: 0 15px 40px rgba(176, 97, 75, 0.25);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            text-align: center;
-            transition: transform 0.2s ease-out;
-        }
-
-        /* Tiêu đề form */
-        .login-form h2 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            color: #b0614b; /* Màu nâu terracotta từ logo */
-            font-weight: 800;
-        }
-
-        .login-form > p {
-            color: #a88f82; /* Màu be nhạt */
-            margin-bottom: 35px;
-            font-weight: 600;
-        }
-
-        /* Nhóm input (label + input) */
-        .input-group {
-            text-align: left;
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #9c7f73; /* Màu nâu be vừa */
-            font-size: 0.9rem;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 14px 18px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-family: 'Montserrat', sans-serif;
-            transition: all 0.3s ease;
-            background-color: #fafafa;
-        }
-
-        .input-group input:focus {
-            outline: none;
-            border-color: #b0614b; /* Màu nâu terracotta khi focus */
-            box-shadow: 0 0 0 4px rgba(176, 97, 75, 0.2);
-        }
-        
-        /* Các tùy chọn như "quên mật khẩu" */
-        .form-options {
-            text-align: right;
-            margin-bottom: 25px;
-        }
-
-        .forgot-password {
-            color: #b0614b;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-
-        /* Nút Đăng Nhập */
-        .login-btn {
-            width: 100%;
-            padding: 16px;
-            /* Gradient màu nâu terracotta sang trọng */
-            background: linear-gradient(45deg, #b0614b, #8c4d3c);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 5px 20px rgba(140, 77, 60, 0.4);
-            letter-spacing: 0.5px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 25px rgba(140, 77, 60, 0.5);
-        }
-
-        /* Link đăng ký */
-        .register-link {
-            margin-top: 30px;
-            font-size: 0.95rem;
-            color: #a88f82;
-        }
-
-        .register-link a {
-            color: #b0614b;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .register-link a:hover {
-            text-decoration: underline;
+        .login-input:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(179, 93, 42, 0.2);
+            outline: none; background-color: white;
         }
     </style>
 </head>
+<body class="bg-orange-50 text-gray-800">
 
-<body>
-    <div class="login-page-wrapper">
-        <!-- NỀN ĐOM ĐÓM MỚI -->
-        <div class="fireflies"></div>
-
-        <!-- Các icon bay lơ lửng cho hiệu ứng nền -->
-        <div class="animated-bg">
-            <i class="fa-solid fa-shirt flying-item"></i>
-            <i class="fa-solid fa-vest-patches flying-item"></i>
-            <i class="fa-solid fa-user-tie flying-item"></i>
-            <i class="fa-solid fa-mitten flying-item"></i>
-            <i class="fa-solid fa-hat-cowboy flying-item"></i>
-            <i class="fa-solid fa-glasses flying-item"></i>
-            <i class="fa-solid fa-socks flying-item"></i>
-            <i class="fa-solid fa-shoe-prints flying-item"></i>
-            <i class="fa-brands fa-redhat flying-item"></i>
-            <i class="fa-solid fa-person-dress flying-item"></i>
-        </div>
-
-        <!-- Form đăng nhập chính -->
-        <div class="login-container">
-            <form action="#" method="POST" class="login-form">
-                <h2>Đăng Nhập</h2>
-                <p>Chào mừng bạn trở lại với 4MEN!</p>
-                <div class="input-group">
-                    <label for="username">Email hoặc Tên đăng nhập</label>
-                    <input type="text" id="username" name="username" placeholder="Nhập email của bạn" required>
-                </div>
-                <div class="input-group">
-                    <label for="password">Mật khẩu</label>
-                    <input type="password" id="password" name="password" placeholder="Nhập mật khẩu" required>
-                </div>
-                <div class="form-options">
-                    <a href="#" class="forgot-password">Quên mật khẩu?</a>
-                </div>
-                <button type="submit" class="login-btn">Đăng Nhập</button>
-                <div class="register-link">
-                    <p>Chưa có tài khoản? <a href="register.php">Đăng ký ngay</a></p>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <script>
-        // Thêm hiệu ứng JavaScript để trang thêm sống động
-        const wrapper = document.querySelector('.login-page-wrapper');
-        const loginContainer = document.querySelector('.login-container');
-        const flyingItems = document.querySelectorAll('.flying-item');
-
-        // Hiệu ứng Parallax cho các icon bay và hiệu ứng 3D cho form
-        wrapper.addEventListener('mousemove', (e) => {
-            let xAxis = (window.innerWidth / 2 - e.pageX) / (window.innerWidth / 2);
-            let yAxis = (window.innerHeight / 2 - e.pageY) / (window.innerHeight / 2);
-
-            loginContainer.style.transform = `perspective(1000px) rotateY(${xAxis * 5}deg) rotateX(${-yAxis * 5}deg)`;
-
-            flyingItems.forEach((item, index) => {
-                const speed = (index + 1) * 0.5;
-                const x = -xAxis * speed * 5;
-                const y = -yAxis * speed * 5;
-                item.style.transform = `translateX(${x}px) translateY(${y}px)`;
-            });
-        });
-
-        // Reset hiệu ứng khi chuột rời khỏi màn hình
-        wrapper.addEventListener('mouseleave', () => {
-            loginContainer.style.transform = 'perspective(1000px) rotateY(0deg) rotateX(0deg)';
-            flyingItems.forEach(item => {
-                item.style.transform = `translateX(0px) translateY(0px)`;
-            });
-        });
-
-        // CẬP NHẬT: Tạo đom đóm bằng JavaScript
-        const firefliesContainer = document.querySelector('.fireflies');
-        const fireflyCount = 30; // Tăng số lượng đom đóm
-
-        for (let i = 0; i < fireflyCount; i++) {
-            const firefly = document.createElement('div');
-            firefly.classList.add('firefly');
-
-            firefly.style.top = `${Math.random() * 100}%`;
-            firefly.style.left = `${Math.random() * 100}%`;
-            firefly.style.animationDuration = `${Math.random() * 5 + 4}s`; // 4s to 9s
-            firefly.style.animationDelay = `${Math.random() * 6}s`; // 0s to 6s
-
-            firefliesContainer.appendChild(firefly);
+<canvas id="pills-canvas"></canvas>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const canvas = document.getElementById('pills-canvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            let items = [];
+            // Màu sắc hạt: Cam, Trắng, Xám nhạt
+            const colors = ['#ffffff', '#fed7aa', '#fdba74', '#b35d2a']; 
+            
+            class Item {
+                constructor() { this.reset(); }
+                reset() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.size = Math.random() * 5 + 2; // Hạt nhỏ hơn
+                    this.speedY = Math.random() * 0.5 + 0.1;
+                    this.color = colors[Math.floor(Math.random() * colors.length)];
+                    this.opacity = Math.random() * 0.5 + 0.1;
+                }
+                update() { this.y -= this.speedY; if (this.y < 0) this.reset(); }
+                draw() {
+                    ctx.save(); ctx.globalAlpha = this.opacity; ctx.fillStyle = this.color;
+                    ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI*2); ctx.fill(); ctx.restore();
+                }
+            }
+            function init() { items = Array.from({ length: 60 }, () => new Item()); }
+            function animate() { 
+                ctx.clearRect(0, 0, canvas.width, canvas.height); 
+                items.forEach(i => { i.update(); i.draw(); }); 
+                requestAnimationFrame(animate); 
+            }
+            init(); animate();
         }
-    </script>
-</body>
+    });
+</script>
 
+<div class="min-h-screen flex items-center justify-center p-4">
+    <div class="bg-white/90 backdrop-blur-lg p-8 md:p-10 rounded-2xl shadow-xl w-full max-w-md login-card-animation border border-orange-100">
+        
+        <div class="flex flex-col items-center mb-6">
+            <div class="p-3 rounded-full bg-orange-100 text-[#b35d2a]">
+                <i class="fas fa-shirt text-3xl"></i>
+            </div>
+            <h1 class="text-3xl font-bold mt-4 text-[#b35d2a]">4MEN SHOP</h1>
+            <p class="text-gray-500 mt-1">Đẳng cấp thời trang phái mạnh</p>
+        </div>
+
+        <?php if ($errorMessage !== ''): ?>
+            <div class="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm border border-red-200">
+                <i class="fas fa-circle-exclamation mr-1"></i> <?php echo htmlspecialchars($errorMessage); ?>
+            </div>
+        <?php elseif ($successMessage !== ''): ?>
+            <div class="mb-4 p-3 rounded-lg bg-green-50 text-green-700 text-sm border border-green-200">
+                <i class="fas fa-check-circle mr-1"></i> <?php echo htmlspecialchars($successMessage); ?>
+            </div>
+        <?php endif; ?>
+
+        <form action="#" method="POST" class="space-y-5">
+            <input type="hidden" name="csrf" value="<?php echo htmlspecialchars($csrfToken); ?>">
+            
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <input type="email" name="email" placeholder="example@gmail.com" required class="login-input">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Mật khẩu</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-gray-400">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <input type="password" name="password" placeholder="••••••••" required class="login-input">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between text-sm">
+                <label class="flex items-center gap-2 cursor-pointer">
+                    <input type="checkbox" class="rounded text-[#b35d2a] focus:ring-[#b35d2a]">
+                    <span class="text-gray-600">Ghi nhớ đăng nhập</span>
+                </label>
+                <a href="#" class="text-[#b35d2a] hover:underline font-medium">Quên mật khẩu?</a>
+            </div>
+
+            <button type="submit" class="login-button w-full py-3 text-lg">
+                Đăng Nhập
+            </button>
+
+            <div class="text-center text-sm text-gray-600 mt-4">
+                Chưa có tài khoản? 
+                <a href="register.php" class="text-[#b35d2a] font-bold hover:underline">Đăng ký ngay</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
 </html>

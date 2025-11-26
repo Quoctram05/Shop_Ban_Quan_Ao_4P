@@ -20,7 +20,7 @@ img {
   width: 100%;
 }
 .container {
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
@@ -119,89 +119,6 @@ ul {
   border-bottom: none;
 }
 
-/* =============================
-   SEARCH BOX
-============================= */
-.search-box {
-  position: relative;
-}
-.search-box input {
-  width: 200px;
-  padding: 8px 35px 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  outline: none;
-  transition: border 0.3s;
-}
-.search-box input:focus {
-  border-color: #b60000;
-}
-.search-box i {
-  position: absolute;
-  right: 10px;
-  top: 8px;
-  color: #555;
-  cursor: pointer;
-  transition: color 0.3s;
-}
-.search-box i:hover {
-  color: #b60000;
-}
-
-/* Gợi ý tìm kiếm */
-.suggest-box {
-  position: absolute;
-  top: 38px;
-  left: 0;
-  width: 100%;
-  background: #fff;
-  border: 1px solid #ddd;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-  display: none;
-  flex-direction: column;
-  border-radius: 4px;
-  z-index: 400;
-}
-.suggest-box a {
-  padding: 8px 12px;
-  color: #333;
-  font-size: 14px;
-}
-.suggest-box a:hover {
-  background: #f5f5f5;
-  color: #b60000;
-}
-
-/* =============================
-   ICONS (User, Cart)
-============================= */
-.icons {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-.icons i {
-  font-size: 18px;
-  color: #333;
-  transition: color 0.3s;
-}
-.icons i:hover {
-  color: #b60000;
-}
-.cart {
-  position: relative;
-}
-.cart .count {
-  position: absolute;
-  top: -6px;
-  right: -8px;
-  background: #b60000;
-  color: #fff;
-  border-radius: 50%;
-  font-size: 11px;
-  padding: 2px 5px;
-}
 
 /* =============================
    BANNER SLIDER
@@ -954,4 +871,175 @@ footer {
 }
 .btn-checkout-dark:hover {
     background-color: #000;
+}
+
+/* =============================
+   HEADER ACTIONS (SEARCH + ICONS)
+============================= */
+
+/* Container bao quanh Search và Icons */
+.header-actions {
+    display: flex;
+    align-items: center; /* Căn giữa dọc */
+    gap: 15px; /* Khoảng cách giữa Search và Icons */
+}
+
+/* --- 1. SEARCH BOX --- */
+/* =============================
+   SEARCH BOX (EXPANDABLE EFFECT)
+============================= */
+
+.search-box {
+    position: relative;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* Căn phải để mở rộng sang trái */
+}
+
+.search-box form {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+/* Ô Input (Trạng thái đóng) */
+.search-input {
+    width: 0; /* Chiều rộng bằng 0 để ẩn */
+    height: 40px;
+    padding: 0; /* Không padding */
+    border: none; /* Không viền */
+    background: transparent;
+    outline: none;
+    opacity: 0; /* Ẩn hoàn toàn */
+    transition: all 0.4s ease-in-out; /* Hiệu ứng trượt mượt mà */
+    border-radius: 20px;
+    font-size: 13px;
+    color: #333;
+    position: relative;
+    z-index: 1; /* Nằm dưới nút */
+    cursor: pointer;
+}
+
+/* Ô Input (Trạng thái MỞ: Khi hover vào hộp HOẶC khi đang gõ) */
+.search-box:hover .search-input,
+.search-input:focus {
+    width: 250px; /* Mở rộng ra */
+    padding: 0 45px 0 15px; /* Padding để chữ không đè lên nút */
+    background-color: #fff;
+    border: 1px solid #b35d2a; /* Viền màu cam */
+    opacity: 1;
+    cursor: text;
+}
+
+/* Nút tìm kiếm (Style đồng bộ với User Icon) */
+.search-btn {
+    position: absolute;
+    right: 0;
+    top: 0;
+    
+    width: 40px; /* Kích thước bằng User Icon */
+    height: 40px;
+    
+    border-radius: 50%; /* Hình tròn */
+    background-color: #f5f5f5; /* Nền xám nhạt (giống User) */
+    color: #333; /* Icon màu đen (giống User) */
+    
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    z-index: 2;
+}
+
+.search-btn i {
+    font-size: 16px;
+}
+
+/* Hiệu ứng khi di chuột: Đổi sang màu Cam chủ đạo */
+.search-box:hover .search-btn,
+.search-input:focus + .search-btn,
+.search-btn:hover {
+    background-color: #b35d2a; /* Màu cam đất */
+    color: #fff; /* Icon trắng */
+    transform: rotate(360deg); /* Xoay nhẹ cho đẹp */
+}
+
+/* --- 2. ICONS GROUP --- */
+.icons-group {
+    display: flex;
+    align-items: center;
+    gap: 30px; /* Khoảng cách giữa User và Cart */
+}
+
+/* Style chung cho hộp icon (tròn xám) */
+.user-icon-box, .cart-icon-box {
+    width: 40px;
+    height: 40px;
+    background-color: #f5f5f5;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+    transition: all 0.3s ease;
+    position: relative; /* Để định vị số lượng */
+}
+
+.user-icon-box i, .cart-icon-box i {
+    font-size: 18px;
+}
+
+/* Hover effect */
+.user-menu a:hover .user-icon-box,
+.cart:hover .cart-icon-box {
+    background-color: #b35d2a;
+    color: #fff;
+}
+
+/* Thông tin User (Tên + Vai trò) */
+.user-menu a {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+}
+
+.user-info {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+}
+
+.user-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #333;
+    white-space: nowrap;
+}
+
+.user-role {
+    font-size: 11px;
+    color: #888;
+    text-transform: uppercase;
+}
+
+/* Số lượng giỏ hàng (Badge đỏ) */
+.cart .count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: #d0021b;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    border: 2px solid #fff;
 }

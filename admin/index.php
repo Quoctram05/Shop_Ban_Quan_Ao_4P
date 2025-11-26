@@ -1,259 +1,191 @@
-<?php
+﻿<?php
+// --- 1. KẾT NỐI CSDL ---
+// Thay đường dẫn cho đúng với cấu trúc thư mục của bạn (thư mục 'public' nằm ở root)
+require_once __DIR__ . '/../public/connect.php';
+// Biến $conn (PDO) đã có sẵn
 
-$pdo = null;
-$dbFile = __DIR__ . '/../db.php';
-if (file_exists($dbFile)) {
-    require_once $dbFile;
-    if (function_exists('pdo')) {
-        $pdo = pdo();
-    } elseif (function_exists('get_pdo')) {
-        $pdo = get_pdo();
-    }
+// --- 2. TÍNH TOÁN THỐNG KÊ ---
+$stats = [
+    'revenue_today' => 0,
+    'orders_today' => 0,
+    'low_stock' => 0,
+    'total_products' => 0
+];
+
+try {
+    // Doanh thu hôm nay
+    $sql = "SELECT SUM(tong_tien) FROM don_hang WHERE DATE(ngay_dat) = CURDATE()";
+    $stats['revenue_today'] = (float)$conn->query($sql)->fetchColumn();
+
+    // Số đơn hàng hôm nay
+    $sql = "SELECT COUNT(*) FROM don_hang WHERE DATE(ngay_dat) = CURDATE()";
+    $stats['orders_today'] = (int)$conn->query($sql)->fetchColumn();
+
+    // Sản phẩm sắp hết hàng (Dựa vào bảng biến thể)
+    // Giả sử dưới 10 cái là sắp hết
+    $sql = "SELECT COUNT(*) FROM bien_the_san_pham WHERE so_luong_ton <= 10 AND so_luong_ton > 0";
+    $stats['low_stock'] = (int)$conn->query($sql)->fetchColumn();
+
+    // Tổng số sản phẩm (Dựa vào bảng sản phẩm cha)
+    $sql = "SELECT COUNT(*) FROM san_pham";
+    $stats['total_products'] = (int)$conn->query($sql)->fetchColumn();
+
+} catch (Exception $e) {
+    // Nếu lỗi truy vấn thì để 0
 }
-if (!$pdo instanceof PDO) {
-    try {
-        $pdo = new PDO(
-            'mysql:host=localhost;dbname=nhathuocantam;charset=utf8mb4',
-            'root',
-            '',
-            [
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            ]
-        );
-        $pdo->exec("SET NAMES utf8mb4 COLLATE utf8mb4_unicode_ci");
-    } catch (Throwable $e) {
-        die('Could not connect to database: ' . $e->getMessage());
-    }
-}
+
+// Hàm định dạng tiền tệ
 if (!function_exists('money_vn')) {
     function money_vn($n) { return number_format((float)$n, 0, ',', '.'); }
 }
 
-date_default_timezone_set('Asia/Ho_Chi_Minh');
+// Cài đặt tiêu đề và menu active
+$page_title = 'Dashboard - Admin 4MEN Shop';
+$active = 'home';
 
-if (!function_exists('admin_index_col_exists')) {
-    function admin_index_col_exists(PDO $pdo, string $table, string $column): bool {
-        $sql = "SELECT COUNT(*) FROM information_schema.COLUMNS
-                WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = ? AND COLUMN_NAME = ?";
-        $st = $pdo->prepare($sql);
-        $st->execute([$table, $column]);
-        return (int)$st->fetchColumn() > 0;
-    }
-}
+// Gọi Header
+require __DIR__ . '/partials/header.php'; 
 
-if (!function_exists('admin_index_enrich_money')) {
-    function admin_index_enrich_money(array &$rows, PDO $pdo): void {
-        if (!$rows) { return; }
-        $itemsCache = [];
-        $ids = [];
-        foreach ($rows as $idx => $row) {
-            $items = json_decode($row['chitiet'] ?? '[]', true);
-            if (!is_array($items)) { $items = []; }
-            $itemsCache[$idx] = $items;
-            foreach ($items as $it) {
-                if (isset($it['masp'])) {
-                    $ids[(int)$it['masp']] = true;
-                }
-            }
-        }
-        $price = [];
-        if ($ids) {
-            $in  = implode(',', array_map('intval', array_keys($ids)));
-            $sql = admin_index_col_exists($pdo, 'sanpham', 'giagiam')
-                ? "SELECT masp, CASE WHEN giagiam>0 THEN giagiam ELSE giaban END AS gia FROM sanpham WHERE masp IN ($in)"
-                : "SELECT masp, giaban AS gia FROM sanpham WHERE masp IN ($in)";
-            foreach ($pdo->query($sql) as $p) {
-                $price[(int)$p['masp']] = (float)$p['gia'];
-            }
-        }
-        foreach ($rows as $idx => &$row) {
-            $items = $itemsCache[$idx] ?? [];
-            $sum = 0;
-            foreach ($items as $it) {
-                $qty = (int)($it['sl'] ?? 0);
-                $masp = (int)($it['masp'] ?? 0);
-                $gia = $price[$masp] ?? 0;
-                $sum += $qty * $gia;
-            }
-            $row['phai_thu'] = max(0, $sum - (float)($row['giagiam'] ?? 0));
-        }
-        unset($row);
-    }
-}
-
-if (!function_exists('admin_index_sum_phai_thu')) {
-    function admin_index_sum_phai_thu(PDO $pdo, string $whereSql, array $params = []): float {
-        $col = admin_index_col_exists($pdo, 'donhang', 'giagiam') ? 'giagiam' : '0';
-        $stmt = $pdo->prepare("SELECT chitiet, $col AS giagiam FROM donhang WHERE $whereSql");
-        $stmt->execute($params);
-        $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        admin_index_enrich_money($rows, $pdo);
-        $total = 0;
-        foreach ($rows as $row) {
-            $total += (float)($row['phai_thu'] ?? 0);
-        }
-        return $total;
-    }
-}
-
-$quickStats = [
-    'revenue_today'  => 0,
-    'orders_today'   => 0,
-    'low_stock'      => 0,
-    'total_products' => 0,
-];
-
-try {
-    $quickStats['revenue_today'] = admin_index_sum_phai_thu(
-        $pdo,
-        "DATE(ngaytao)=CURDATE() AND trangthai IN ('da_thanh_toan','da_giao')"
-    );
-} catch (Throwable $e) {
-    $quickStats['revenue_today'] = 0;
-}
-try {
-    $quickStats['orders_today'] = (int)$pdo->query(
-        "SELECT COUNT(*) FROM donhang WHERE DATE(ngaytao)=CURDATE() AND trangthai='moi'"
-    )->fetchColumn();
-} catch (Throwable $e) {
-    $quickStats['orders_today'] = 0;
-}
-try {
-    $quickStats['low_stock'] = (int)$pdo->query(
-        "SELECT COUNT(*) FROM tonkho WHERE soluong>0 AND soluong <= 10"
-    )->fetchColumn();
-} catch (Throwable $e) {
-    $quickStats['low_stock'] = 0;
-}
-try {
-    $baseProductSql = "SELECT COUNT(*) FROM sanpham";
-    if (admin_index_col_exists($pdo, 'sanpham', 'trangthai')) {
-        $baseProductSql .= " WHERE trangthai = 1";
-    }
-    $quickStats['total_products'] = (int)$pdo->query($baseProductSql)->fetchColumn();
-} catch (Throwable $e) {
-    $quickStats['total_products'] = 0;
-}
-
-$staffStats = [
-    'total'  => 0,
-    'active' => 0,
-    'pause'  => 0,
-    'left'   => 0,
-];
-try {
-    $staffStats['total'] = (int)$pdo->query("SELECT COUNT(*) FROM nhanvien")->fetchColumn();
-    $staffStats['active'] = (int)$pdo->query("SELECT COUNT(*) FROM nhanvien WHERE trangthai='dang_lam'")->fetchColumn();
-    $staffStats['pause'] = (int)$pdo->query("SELECT COUNT(*) FROM nhanvien WHERE trangthai='tam_nghi'")->fetchColumn();
-    $staffStats['left'] = (int)$pdo->query("SELECT COUNT(*) FROM nhanvien WHERE trangthai='da_nghi'")->fetchColumn();
-} catch (Throwable $e) {
-    $staffStats = ['total' => 0, 'active' => 0, 'pause' => 0, 'left' => 0];
-}
-
-$page_title = 'Trang Chủ - Quản Trị Nhà Thuốc';
-$active = 'home'; 
-require __DIR__ . '/partials/header.php'; // Gọi toàn bộ layout, CSS và hiệu ứng vào
+// Lấy thông tin admin từ session
+$adminName = $_SESSION['user_name'] ?? 'Admin';
+$adminRole = $_SESSION['user_role'] ?? 'QuanTriVien';
 ?>
 
 <!-- =============================================== -->
-<!-- BẮT ĐẦU NỘI DUNG RIÊNG CỦA TRANG INDEX          -->
+<!-- NỘI DUNG CHÍNH DASHBOARD -->
 <!-- =============================================== -->
-<main class="flex-1 p-8 overflow-y-auto">
+<main class="flex-1 p-8 overflow-y-auto bg-slate-50/50">
     <div class="max-w-7xl mx-auto">
-        <!-- Header của phần nội dung -->
+        
+        <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-gray-800">Chào mừng trở lại!</h2>
-                <p class="text-gray-500 mt-1">Đây là trang quản trị của Shop Quần Áo 4P.</p>
+                <h2 class="text-3xl font-bold text-gray-800">Tổng quan</h2>
+                <p class="text-gray-500 mt-1">Chào mừng quay trở lại, <?php echo htmlspecialchars($adminName); ?>!</p>
             </div>
             <div class="flex items-center gap-4">
-                <div class="relative">
-                   <input type="search" placeholder="Tìm kiếm sản phẩm..." class="pl-10 pr-4 py-2 w-72 border border-gray-300 rounded-full bg-white shadow-sm focus:ring-2 focus:outline-none transition" style="--tw-ring-color: var(--primary-color)">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"><circle cx="11" cy="11" r="8"/><line x1="21" x2="16.65" y1="21" y2="16.65"/></svg>
-                </div>
-                <div class="flex items-center gap-3">
-                     <img src="https://placehold.co/40x40/0284c7/FFFFFF?text=A" alt="Avatar" class="rounded-full">
-                    <div>
-                        <p class="font-semibold">Nguyễn Văn A</p>
-                        <p class="text-sm text-gray-500">Quản trị viên</p>
+                <div class="flex items-center gap-3 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+                    <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
+                        A
+                    </div>
+                    <div class="text-sm">
+                        <p class="font-semibold text-gray-700"><?php echo htmlspecialchars($adminName); ?></p>
+                        <p class="text-xs text-gray-500"><?php echo htmlspecialchars($adminRole); ?></p>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Phần thẻ thông tin tổng quan -->
-        <div class="bg-white/80 backdrop-blur-lg p-6 rounded-2xl shadow-md border border-gray-200">
-            <h3 class="text-xl font-semibold mb-4" style="color: var(--primary-dark);">Tổng quan nhanh</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-gray-500 font-medium">Doanh thu hôm nay</h4>
-                    <p class="text-2xl md:text-3xl font-bold mt-2 whitespace-nowrap" style="color: var(--primary-color)">
-                        <?=money_vn($quickStats['revenue_today'])?>đ
-                    </p>
+        <!-- Các thẻ thống kê (Stats Cards) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            
+            <!-- Card 1: Doanh thu -->
+            <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i class="fa-solid fa-sack-dollar text-6xl text-orange-600"></i>
                 </div>
-                <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-gray-500 font-medium">Đơn hàng mới</h4>
-                    <p class="text-3xl font-bold text-sky-600 mt-2">
-                        <?=number_format($quickStats['orders_today'], 0, ',', '.')?>
-                    </p>
+                <h4 class="text-gray-500 font-medium text-sm uppercase tracking-wider">Doanh thu hôm nay</h4>
+                <p class="text-3xl font-bold mt-2 text-gray-800">
+                    <?=money_vn($stats['revenue_today'])?> <span class="text-lg text-gray-400">đ</span>
+                </p>
+                <p class="text-xs text-green-500 mt-2 font-medium flex items-center">
+                    <i class="fa-solid fa-arrow-trend-up mr-1"></i> Cập nhật realtime
+                </p>
+            </div>
+
+            <!-- Card 2: Đơn hàng -->
+            <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i class="fa-solid fa-cart-shopping text-6xl text-blue-600"></i>
                 </div>
-                <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-gray-500 font-medium">Sắp hết hàng</h4>
-                    <p class="text-3xl font-bold text-amber-600 mt-2">
-                        <?=number_format($quickStats['low_stock'], 0, ',', '.')?>
-                    </p>
+                <h4 class="text-gray-500 font-medium text-sm uppercase tracking-wider">Đơn hàng mới</h4>
+                <p class="text-3xl font-bold mt-2 text-gray-800">
+                    <?=$stats['orders_today']?>
+                </p>
+                <p class="text-xs text-blue-500 mt-2 font-medium">
+                    Hôm nay
+                </p>
+            </div>
+
+            <!-- Card 3: Sắp hết hàng -->
+            <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i class="fa-solid fa-triangle-exclamation text-6xl text-red-600"></i>
                 </div>
-                <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-gray-500 font-medium">Tổng số sản phẩm</h4>
-                    <p class="text-3xl font-bold text-slate-600 mt-2">
-                        <?=number_format($quickStats['total_products'], 0, ',', '.')?>
-                    </p>
+                <h4 class="text-gray-500 font-medium text-sm uppercase tracking-wider">Sắp hết hàng</h4>
+                <p class="text-3xl font-bold mt-2 text-gray-800">
+                    <?=$stats['low_stock']?>
+                </p>
+                <p class="text-xs text-red-500 mt-2 font-medium">
+                    Biến thể cần nhập thêm
+                </p>
+            </div>
+
+            <!-- Card 4: Tổng sản phẩm -->
+            <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="absolute top-0 right-0 p-4 opacity-10">
+                    <i class="fa-solid fa-layer-group text-6xl text-purple-600"></i>
                 </div>
+                <h4 class="text-gray-500 font-medium text-sm uppercase tracking-wider">Tổng sản phẩm</h4>
+                <p class="text-3xl font-bold mt-2 text-gray-800">
+                    <?=$stats['total_products']?>
+                </p>
+                <p class="text-xs text-gray-400 mt-2 font-medium">
+                    Đang kinh doanh
+                </p>
             </div>
         </div>
-        <div class="bg-white/80 backdrop-blur-lg p-6 rounded-2xl shadow-md border border-gray-200 mt-8">
-            <div class="flex items-center justify-between mb-4">
-                <h3 class="text-xl font-semibold" style="color: var(--primary-dark);">Tổng quan nhân viên</h3>
-                <p class="text-sm text-gray-500">Dữ liệu thống kê từ bảng nhân viên</p>
+
+        <!-- Khu vực Bảng đơn hàng mới nhất -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+            <div class="p-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-lg font-bold text-gray-800">Đơn hàng vừa đặt</h3>
+                <a href="don-hang.php" class="text-sm text-orange-600 hover:underline font-medium">Xem tất cả</a>
             </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-gray-500 font-medium">Tổng nhân viên</h4>
-                    <p class="text-3xl font-bold text-sky-700 mt-2">
-                        <?=number_format($staffStats['total'], 0, ',', '.')?>
-                    </p>
-                </div>
-                <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-gray-500 font-medium">Đang làm</h4>
-                    <p class="text-3xl font-bold text-emerald-600 mt-2">
-                        <?=number_format($staffStats['active'], 0, ',', '.')?>
-                    </p>
-                </div>
-                <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-gray-500 font-medium">Tạm nghỉ</h4>
-                    <p class="text-3xl font-bold text-amber-600 mt-2">
-                        <?=number_format($staffStats['pause'], 0, ',', '.')?>
-                    </p>
-                </div>
-                <div class="dashboard-card bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                    <h4 class="text-gray-500 font-medium">Đã nghỉ</h4>
-                    <p class="text-3xl font-bold text-slate-700 mt-2">
-                        <?=number_format($staffStats['left'], 0, ',', '.')?>
-                    </p>
-                </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase">Mã đơn</th>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase">Khách hàng</th>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase">Tổng tiền</th>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase">Trạng thái</th>
+                            <th class="p-4 text-xs font-semibold text-gray-500 uppercase">Ngày đặt</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <?php
+                        // Lấy 5 đơn hàng mới nhất từ bảng don_hang
+                        try {
+                            $stmt = $conn->query("SELECT * FROM don_hang ORDER BY id DESC LIMIT 5");
+                            while ($row = $stmt->fetch()) {
+                                // Xử lý màu trạng thái
+                                $statusClass = 'bg-gray-100 text-gray-600';
+                                if ($row['trang_thai'] == 'ChoXuLy') $statusClass = 'bg-yellow-100 text-yellow-700';
+                                elseif ($row['trang_thai'] == 'HoanThanh') $statusClass = 'bg-green-100 text-green-700';
+                                elseif ($row['trang_thai'] == 'Huy') $statusClass = 'bg-red-100 text-red-700';
+                                
+                                echo "<tr class='hover:bg-gray-50 transition'>";
+                                echo "<td class='p-4 font-medium text-gray-900'>#{$row['id']}</td>";
+                                echo "<td class='p-4 text-gray-600'>".htmlspecialchars($row['ho_ten'])."<br><span class='text-xs text-gray-400'>{$row['so_dien_thoai']}</span></td>";
+                                echo "<td class='p-4 font-bold text-gray-800'>".money_vn($row['tong_tien'])."đ</td>";
+                                echo "<td class='p-4'><span class='px-3 py-1 rounded-full text-xs font-bold {$statusClass}'>{$row['trang_thai']}</span></td>";
+                                echo "<td class='p-4 text-sm text-gray-500'>".date('d/m/Y H:i', strtotime($row['ngay_dat']))."</td>";
+                                echo "</tr>";
+                            }
+                        } catch (Exception $e) {
+                            echo "<tr><td colspan='5' class='p-4 text-center text-red-500'>Lỗi tải dữ liệu</td></tr>";
+                        }
+                        ?>
+                    </tbody>
+                </table>
             </div>
         </div>
+
     </div>
 </main>
-<!-- =============================================== -->
-<!-- KẾT THÚC NỘI DUNG RIÊNG CỦA TRANG INDEX         -->
-<!-- =============================================== -->
 
-<?php
-// Đóng các thẻ HTML đã được mở trong header.php
-?>
-</div> <!-- Đóng thẻ div.flex.h-screen -->
+<!-- Đóng thẻ main và body đã mở ở header.php -->
+</div> 
 </body>
 </html>
-
