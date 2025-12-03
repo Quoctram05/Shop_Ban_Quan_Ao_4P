@@ -6,7 +6,7 @@ include('../public/connect.php');
   <!-- Breadcrumb -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Áo Hoodie & Sweatshirt Nam</p>
+      <p>4P / Áo Hoodie & Sweatshirt Nam</p>
     </div>
   </section>
 

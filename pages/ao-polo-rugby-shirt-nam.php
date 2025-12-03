@@ -4,7 +4,7 @@
   <!-- Breadcrumb -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Áo Polo & Rugby Shirt Nam</p>
+      <p>4P / Áo Polo & Rugby Shirt Nam</p>
     </div>
   </section>
 

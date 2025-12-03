@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-$page_title = 'Đăng Nhập - 4MEN Shop';
+$page_title = 'Đăng Nhập - 4P Shop';
 ?>
 <!DOCTYPE html>
 <html lang="vi">
@@ -102,7 +102,7 @@ $page_title = 'Đăng Nhập - 4MEN Shop';
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* === TÔNG MÀU 4MEN (CAM ĐẤT) === */
+        /* === TÔNG MÀU 4P (CAM ĐẤT) === */
         :root {
             --primary-color: #b35d2a;
             --primary-light: #fff7ed;
@@ -210,7 +210,7 @@ $page_title = 'Đăng Nhập - 4MEN Shop';
             <div class="p-3 rounded-full bg-orange-100 text-[#b35d2a]">
                 <i class="fas fa-shirt text-3xl"></i>
             </div>
-            <h1 class="text-3xl font-bold mt-4 text-[#b35d2a]">4MEN SHOP</h1>
+            <h1 class="text-3xl font-bold mt-4 text-[#b35d2a]">4P SHOP</h1>
             <p class="text-gray-500 mt-1">Đẳng cấp thời trang phái mạnh</p>
         </div>
 

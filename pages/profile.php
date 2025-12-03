@@ -1,10 +1,11 @@
 <?php
 session_start();
-require_once('../public/connect.php');
+// Đảm bảo đường dẫn này đúng với cấu trúc thư mục của bạn
+require_once('../public/connect.php'); 
 include('../header.php');
 include('../navbar.php');
 
-// Kiểm tra đăng nhập
+// 1. Kiểm tra đăng nhập
 if (!isset($_SESSION['user_id'])) {
     echo "<script>window.location.href='../login.php';</script>";
     exit();
@@ -12,17 +13,17 @@ if (!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-// 1. Lấy thông tin người dùng
+// 2. Lấy thông tin người dùng
 $stmt = $conn->prepare("SELECT * FROM nguoi_dung WHERE id = ?");
 $stmt->execute([$user_id]);
 $user = $stmt->fetch();
 
-// 2. Lấy lịch sử đơn hàng
+// 3. Lấy lịch sử đơn hàng
 $stmt_orders = $conn->prepare("SELECT * FROM don_hang WHERE nguoi_dung_id = ? ORDER BY id DESC");
 $stmt_orders->execute([$user_id]);
 $orders = $stmt_orders->fetchAll();
 
-// 3. Tính toán thống kê nhanh
+// 4. Thống kê nhanh
 $total_orders = count($orders);
 $total_spent = 0;
 foreach ($orders as $o) {
@@ -32,398 +33,249 @@ foreach ($orders as $o) {
 }
 ?>
 
-<!-- CSS HIỆU ỨNG RIÊNG -->
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
 <style>
     :root {
-        --primary: #9a3412;
+        --primary: #b35d2a; /* Màu cam đất chủ đạo */
         --primary-light: #fff7ed;
-        --primary-hover: #7c2d10;
-        --gray-text: #4b5563;
+        --gray-light: #f9fafb;
     }
+    
+    body { background-color: #f3f4f6; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
 
-    /* 1. Animation Global */
-    @keyframes slideUpFade {
-        from { opacity: 0; transform: translateY(30px); }
+    /* Animation */
+    @keyframes slideUp {
+        from { opacity: 0; transform: translateY(20px); }
         to { opacity: 1; transform: translateY(0); }
     }
-    
-    .animate-entry {
-        animation: slideUpFade 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        opacity: 0; /* Mặc định ẩn để chờ animation */
-    }
-    
+    .animate-fade-up { animation: slideUp 0.5s ease-out forwards; }
     .delay-100 { animation-delay: 0.1s; }
-    .delay-200 { animation-delay: 0.2s; }
-    .delay-300 { animation-delay: 0.3s; }
 
-    /* 2. Card Effects */
-    .glass-card {
-        background: rgba(255, 255, 255, 0.95);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(255, 255, 255, 0.5);
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-        transition: all 0.3s ease;
+    /* Sidebar Menu */
+    .profile-menu-item {
+        display: flex; align-items: center; gap: 12px;
+        padding: 12px 16px;
+        color: #4b5563; font-weight: 500;
+        border-radius: 8px; transition: all 0.2s;
+        text-decoration: none;
     }
-    
-    .order-card {
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        border: 1px solid transparent;
-    }
-    
-    .order-card:hover {
-        transform: translateY(-4px) scale(1.005);
-        box-shadow: 0 20px 25px -5px rgba(154, 52, 18, 0.1), 0 10px 10px -5px rgba(154, 52, 18, 0.04);
-        border-color: rgba(154, 52, 18, 0.2);
-    }
-
-    /* 3. Filter Tabs */
-    .filter-btn {
-        position: relative;
-        transition: all 0.3s ease;
-        background: transparent;
-        color: #6b7280;
-    }
-    
-    .filter-btn.active {
-        color: var(--primary);
-        font-weight: 700;
+    .profile-menu-item:hover, .profile-menu-item.active {
         background-color: var(--primary-light);
+        color: var(--primary);
+    }
+    .profile-menu-item i { width: 20px; text-align: center; }
+
+    /* Order Card */
+    .order-card {
+        background: white; border-radius: 12px;
+        border: 1px solid #e5e7eb;
+        overflow: hidden; transition: all 0.3s;
+        margin-bottom: 20px;
+    }
+    .order-card:hover {
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        border-color: #fdba74;
+        transform: translateY(-2px);
+    }
+
+    /* Tabs lọc trạng thái */
+    .filter-tab {
+        padding: 8px 16px; border-radius: 99px;
+        font-size: 14px; font-weight: 600; color: #6b7280;
+        cursor: pointer; transition: all 0.2s;
+        border: 1px solid transparent; background: none; white-space: nowrap;
+    }
+    .filter-tab:hover { background-color: #fff; color: #333; }
+    .filter-tab.active {
+        background-color: var(--primary); color: white;
+        box-shadow: 0 4px 6px -1px rgba(180, 83, 9, 0.2);
     }
     
-    .filter-btn.active::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 40%;
-        height: 3px;
-        background-color: var(--primary);
-        border-radius: 99px;
+    /* Status Badge Colors */
+    .badge-status { 
+        padding: 4px 10px; border-radius: 6px; font-size: 12px; 
+        font-weight: 700; text-transform: uppercase; display: inline-block;
     }
-
-    /* 4. Utilities */
-    .copy-icon {
-        opacity: 0;
-        transition: opacity 0.2s;
-        cursor: pointer;
-    }
-    .group:hover .copy-icon {
-        opacity: 1;
-    }
-
-    /* 5. Custom Scrollbar */
-    ::-webkit-scrollbar { width: 6px; }
-    ::-webkit-scrollbar-track { background: #f1f1f1; }
-    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    .status-ChoXuLy { background: #fff7ed; color: #c2410c; border: 1px solid #fed7aa; }
+    .status-DangGiao { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+    .status-HoanThanh { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+    .status-Huy { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 </style>
 
-<div class="bg-[#fcfaf8] min-h-screen py-10 font-sans text-slate-800">
-    <!-- Toast Notification Container -->
-    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+<div class="container mx-auto px-4 py-8 max-w-7xl min-h-screen">
+    
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
 
-    <div class="container mx-auto px-4 max-w-6xl">
-        
-        <!-- HEADER + STATS -->
-        <div class="flex flex-col md:flex-row items-center justify-between mb-10 animate-entry">
-            <div>
-                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">
-                    Xin chào, <span class="text-[#9a3412]"><?php echo htmlspecialchars($user['ho_ten']); ?></span>
-                </h1>
-                <p class="text-gray-500 mt-2 flex items-center gap-2">
-                    <span class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                    Thành viên thân thiết
-                </p>
+        <div class="lg:col-span-3 space-y-6 animate-fade-up">
+            
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-20 bg-gradient-to-r from-[#b35d2a] to-[#ea580c]"></div>
+                
+                <div class="relative mt-4">
+                    <div class="w-24 h-24 mx-auto bg-white p-1 rounded-full shadow-md">
+                        <div class="w-full h-full bg-orange-50 rounded-full flex items-center justify-center text-4xl text-[#b35d2a]">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900 mt-3"><?php echo htmlspecialchars($user['ho_ten']); ?></h2>
+                    <p class="text-sm text-gray-500"><?php echo htmlspecialchars($user['email']); ?></p>
+                    
+                    <div class="mt-4 flex justify-center gap-2">
+                        <span class="px-3 py-1 bg-yellow-100 text-yellow-700 text-xs font-bold rounded-full">Thành viên thân thiết</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-gray-100">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold">Đơn hàng</p>
+                        <p class="text-lg font-bold text-gray-800"><?php echo $total_orders; ?></p>
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase font-bold">Chi tiêu</p>
+                        <p class="text-lg font-bold text-[#b35d2a]"><?php echo number_format($total_spent); ?>đ</p>
+                    </div>
+                </div>
             </div>
-            <div class="mt-6 md:mt-0 flex gap-4">
-                <div class="glass-card px-6 py-4 rounded-2xl flex items-center gap-4 hover:shadow-lg transition-shadow">
-                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-[#9a3412] text-xl">
-                        <i class="fa-solid fa-shopping-bag"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Tổng đơn</p>
-                        <p class="font-bold text-2xl text-gray-800 counter" data-target="<?php echo $total_orders; ?>">0</p>
-                    </div>
-                </div>
-                <div class="glass-card px-6 py-4 rounded-2xl flex items-center gap-4 hover:shadow-lg transition-shadow">
-                    <div class="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center text-[#9a3412] text-xl">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500 font-bold uppercase tracking-wider">Đã chi tiêu</p>
-                        <p class="font-bold text-2xl text-[#9a3412]"><?php echo number_format($total_spent, 0, ',', '.'); ?>đ</p>
-                    </div>
-                </div>
+
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                <nav class="space-y-1 flex flex-col">
+                    <a href="#" class="profile-menu-item active">
+                        <i class="fa-solid fa-box-open"></i> Đơn mua của tôi
+                    </a>
+                    <a href="#" class="profile-menu-item">
+                        <i class="fa-solid fa-user-gear"></i> Hồ sơ cá nhân
+                    </a>
+                    <a href="#" class="profile-menu-item">
+                        <i class="fa-solid fa-map-location-dot"></i> Sổ địa chỉ
+                    </a>
+                    <div class="border-t border-gray-100 my-2"></div>
+                    <a href="../logout.php" onclick="return confirm('Bạn có chắc muốn đăng xuất?')" class="profile-menu-item text-red-600 hover:bg-red-50 hover:text-red-700">
+                        <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+                    </a>
+                </nav>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div class="lg:col-span-9 animate-fade-up delay-100">
             
-            <!-- LEFT SIDEBAR -->
-            <div class="lg:col-span-3 animate-entry delay-100">
-                <div class="glass-card rounded-2xl overflow-hidden sticky top-24">
-                    <div class="h-28 bg-gradient-to-br from-[#9a3412] to-[#ea580c] relative">
-                        <div class="absolute -bottom-10 left-1/2 transform -translate-x-1/2">
-                            <div class="p-1.5 bg-white rounded-full shadow-lg">
-                                <div class="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center overflow-hidden border-2 border-white">
-                                    <i class="fa-solid fa-user text-3xl text-gray-400"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="pt-12 pb-6 px-4 text-center">
-                        <h2 class="font-bold text-lg text-gray-900"><?php echo htmlspecialchars($user['ho_ten']); ?></h2>
-                        <p class="text-sm text-gray-500 mb-6 truncate"><?php echo htmlspecialchars($user['email']); ?></p>
-                        
-                        <div class="space-y-1 text-left">
-                            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-orange-50 text-[#9a3412] font-semibold transition-all">
-                                <i class="fa-solid fa-box-open w-5 text-center"></i> Đơn mua
-                            </button>
-                            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
-                                <i class="fa-solid fa-user-pen w-5 text-center"></i> Hồ sơ
-                            </button>
-                            <button class="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-gray-600 hover:bg-gray-50 transition-all">
-                                <i class="fa-solid fa-map-location-dot w-5 text-center"></i> Địa chỉ
-                            </button>
-                        </div>
-                        
-                        <div class="mt-6 pt-6 border-t border-gray-100">
-                            <a href="../logout.php" class="flex items-center justify-center gap-2 w-full py-2.5 text-red-500 bg-red-50 hover:bg-red-100 rounded-xl transition font-semibold text-sm">
-                                <i class="fa-solid fa-arrow-right-from-bracket"></i> Đăng xuất
-                            </a>
-                        </div>
-                    </div>
-                </div>
+            <div class="flex flex-wrap items-center gap-2 mb-6 overflow-x-auto pb-2 scrollbar-hide">
+                <button class="filter-tab active" onclick="filterOrders('all', this)">Tất cả</button>
+                <button class="filter-tab" onclick="filterOrders('ChoXuLy', this)">Chờ xử lý</button>
+                <button class="filter-tab" onclick="filterOrders('DangGiao', this)">Đang giao</button>
+                <button class="filter-tab" onclick="filterOrders('HoanThanh', this)">Hoàn thành</button>
+                <button class="filter-tab" onclick="filterOrders('Huy', this)">Đã hủy</button>
             </div>
 
-            <!-- RIGHT CONTENT -->
-            <div class="lg:col-span-9 space-y-6 animate-entry delay-200">
-                
-                <!-- Filter & Search Bar -->
-                <div class="glass-card rounded-2xl p-2 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <!-- Tabs -->
-                    <div class="flex p-1 bg-gray-100/50 rounded-xl w-full md:w-auto overflow-x-auto">
-                        <button onclick="filterOrders('all')" class="filter-btn active px-4 py-2 rounded-lg text-sm whitespace-nowrap" id="btn-all">Tất cả</button>
-                        <button onclick="filterOrders('ChoXuLy')" class="filter-btn px-4 py-2 rounded-lg text-sm whitespace-nowrap" id="btn-ChoXuLy">Chờ xử lý</button>
-                        <button onclick="filterOrders('DangGiao')" class="filter-btn px-4 py-2 rounded-lg text-sm whitespace-nowrap" id="btn-DangGiao">Đang giao</button>
-                        <button onclick="filterOrders('HoanThanh')" class="filter-btn px-4 py-2 rounded-lg text-sm whitespace-nowrap" id="btn-HoanThanh">Hoàn thành</button>
-                        <button onclick="filterOrders('Huy')" class="filter-btn px-4 py-2 rounded-lg text-sm whitespace-nowrap" id="btn-Huy">Đã hủy</button>
-                    </div>
-
-                    <!-- Search Input -->
-                    <div class="relative w-full md:w-64">
-                        <input type="text" id="orderSearch" onkeyup="searchOrder()" placeholder="Tìm mã đơn hàng..." 
-                            class="w-full pl-10 pr-4 py-2 rounded-xl border border-gray-200 focus:outline-none focus:border-[#9a3412] focus:ring-1 focus:ring-[#9a3412] transition-all bg-white text-sm">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-gray-400"></i>
-                    </div>
-                </div>
-
-                <!-- Order List -->
-                <div id="orderList" class="space-y-5">
-                    <?php if (count($orders) > 0): ?>
-                        <?php foreach ($orders as $order): 
-                            // Get items
-                            $stmt_items = $conn->prepare("
-                                SELECT c.*, b.hinh_anh_dai_dien 
-                                FROM chi_tiet_don_hang c 
-                                LEFT JOIN bien_the_san_pham b ON c.bien_the_id = b.id 
-                                WHERE c.don_hang_id = ?
-                            ");
+            <div id="order-list" class="space-y-4">
+                <?php if (count($orders) > 0): ?>
+                    <?php foreach ($orders as $order): ?>
+                        <?php 
+                            // Lấy chi tiết sản phẩm
+                            $stmt_items = $conn->prepare("SELECT ct.*, b.hinh_anh_dai_dien FROM chi_tiet_don_hang ct LEFT JOIN bien_the_san_pham b ON ct.bien_the_id = b.id WHERE don_hang_id = ?");
                             $stmt_items->execute([$order['id']]);
                             $items = $stmt_items->fetchAll();
                             
-                            // Status Logic
-                            $stt_bg = 'bg-gray-100 text-gray-600 border-gray-200';
-                            $stt_text = 'Đang xử lý';
-                            $stt_icon = 'fa-spinner fa-spin';
-                            
-                            if ($order['trang_thai'] == 'ChoXuLy') {
-                                $stt_bg = 'bg-orange-50 text-orange-700 border-orange-100';
-                                $stt_text = 'Chờ xử lý';
-                                $stt_icon = 'fa-clock';
-                            } elseif ($order['trang_thai'] == 'DangGiao') {
-                                $stt_bg = 'bg-blue-50 text-blue-700 border-blue-100';
-                                $stt_text = 'Đang giao hàng';
-                                $stt_icon = 'fa-truck-fast';
-                            } elseif ($order['trang_thai'] == 'HoanThanh') {
-                                $stt_bg = 'bg-green-50 text-green-700 border-green-100';
-                                $stt_text = 'Hoàn thành';
-                                $stt_icon = 'fa-circle-check';
-                            } elseif ($order['trang_thai'] == 'Huy') {
-                                $stt_bg = 'bg-red-50 text-red-700 border-red-100';
-                                $stt_text = 'Đã hủy';
-                                $stt_icon = 'fa-circle-xmark';
-                            }
+                            // Xác định trạng thái
+                            $statusKey = $order['trang_thai'];
+                            $statusLabel = match($statusKey) {
+                                'ChoXuLy' => 'Chờ xử lý',
+                                'DangGiao' => 'Đang giao hàng',
+                                'HoanThanh' => 'Giao thành công',
+                                'Huy' => 'Đã hủy',
+                                default => $statusKey
+                            };
                         ?>
                         
-                        <!-- Order Item Block -->
-                        <div class="order-card bg-white rounded-2xl p-6 shadow-sm group relative" data-status="<?php echo $order['trang_thai']; ?>" data-id="<?php echo $order['id']; ?>">
-                            
-                            <!-- Header -->
-                            <div class="flex flex-wrap justify-between items-start gap-4 mb-5 border-b border-gray-100 pb-4">
+                        <div class="order-card p-6 group" data-status="<?php echo $statusKey; ?>">
+                            <div class="flex justify-between items-start border-b border-gray-100 pb-4 mb-4">
                                 <div>
-                                    <div class="flex items-center gap-2 mb-1">
-                                        <span class="px-2.5 py-0.5 rounded text-[10px] font-bold bg-gray-800 text-white uppercase tracking-wider">Đơn hàng</span>
-                                        <div class="flex items-center gap-2 cursor-pointer group/id" onclick="copyToClipboard('#<?php echo $order['id']; ?>')">
-                                            <span class="text-lg font-bold text-gray-800">#<?php echo $order['id']; ?></span>
-                                            <i class="fa-regular fa-copy text-gray-400 text-xs copy-icon group-hover/id:text-[#9a3412]"></i>
-                                        </div>
+                                    <div class="flex items-center gap-3 mb-1">
+                                        <span class="text-lg font-bold text-gray-900">#<?php echo $order['id']; ?></span>
+                                        <span class="text-xs text-gray-400">•</span>
+                                        <span class="text-sm text-gray-500"><?php echo date('d/m/Y H:i', strtotime($order['ngay_dat'])); ?></span>
                                     </div>
                                     <p class="text-xs text-gray-500 flex items-center gap-1">
-                                        <i class="fa-regular fa-calendar"></i> <?php echo date('d/m/Y H:i', strtotime($order['ngay_dat'])); ?>
+                                        <i class="fa-regular fa-credit-card"></i> Thanh toán: <span class="uppercase font-semibold"><?php echo $order['phuong_thuc_thanh_toan']; ?></span>
                                     </p>
                                 </div>
-                                <div class="px-3 py-1.5 rounded-full border <?php echo $stt_bg; ?> text-xs font-bold flex items-center gap-1.5 shadow-sm">
-                                    <i class="fa-solid <?php echo $stt_icon; ?>"></i> <?php echo $stt_text; ?>
-                                </div>
+                                <span class="badge-status status-<?php echo $statusKey; ?>">
+                                    <?php echo $statusLabel; ?>
+                                </span>
                             </div>
 
-                            <!-- Products -->
-                            <div class="space-y-4 mb-5">
-                                <?php foreach ($items as $item): ?>
-                                    <div class="flex items-start gap-4 p-2 hover:bg-gray-50 rounded-xl transition-colors">
-                                        <div class="w-16 h-16 rounded-lg border border-gray-100 overflow-hidden flex-shrink-0 bg-white shadow-sm">
-                                            <?php if(!empty($item['hinh_anh_dai_dien'])): ?>
-                                                <img src="<?php echo $item['hinh_anh_dai_dien']; ?>" class="w-full h-full object-cover transform hover:scale-110 transition-transform duration-500" alt="Product">
-                                            <?php else: ?>
-                                                <div class="w-full h-full flex items-center justify-center text-gray-300 bg-gray-50"><i class="fa-solid fa-image"></i></div>
-                                            <?php endif; ?>
+                            <div class="space-y-4">
+                                <?php foreach ($items as $index => $item): ?>
+                                    <?php 
+                                        // Xử lý ảnh
+                                        $imgSrc = !empty($item['hinh_anh_dai_dien']) 
+                                            ? '../' . str_replace('../', '', $item['hinh_anh_dai_dien']) 
+                                            : '../assets/img/no-image.jpg';
+                                    ?>
+                                    <div class="flex gap-4">
+                                        <div class="w-16 h-20 flex-shrink-0 rounded-md border border-gray-200 overflow-hidden bg-gray-50">
+                                            <img src="<?php echo $imgSrc; ?>" class="w-full h-full object-cover" alt="Img" onerror="this.src='https://via.placeholder.com/64x80'">
                                         </div>
-                                        <div class="flex-1 min-w-0">
-                                            <h4 class="font-semibold text-gray-800 text-sm truncate"><?php echo htmlspecialchars($item['ten_san_pham']); ?></h4>
-                                            <p class="text-xs text-gray-500 mt-0.5">Phân loại: <span class="text-gray-700">Mặc định</span></p>
+                                        
+                                        <div class="flex-1">
+                                            <h4 class="text-sm font-semibold text-gray-800 line-clamp-1"><?php echo htmlspecialchars($item['ten_san_pham']); ?></h4>
                                             <div class="flex justify-between items-center mt-2">
-                                                <span class="text-xs bg-gray-100 px-2 py-0.5 rounded text-gray-600">x<?php echo $item['so_luong']; ?></span>
-                                                <span class="text-sm font-bold text-gray-700"><?php echo number_format($item['don_gia'], 0, ',', '.'); ?>đ</span>
+                                                <span class="text-xs text-gray-500 bg-gray-100 px-2 py-0.5 rounded">x<?php echo $item['so_luong']; ?></span>
+                                                <span class="text-sm font-medium text-gray-900"><?php echo number_format($item['don_gia'], 0, ',', '.'); ?>đ</span>
                                             </div>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
                             </div>
-                            
-                            <!-- Footer -->
-                            <div class="flex flex-col sm:flex-row justify-between items-center pt-4 border-t border-gray-100 gap-4">
-                                <div class="text-xs text-gray-500 flex items-center gap-1">
-                                    <i class="fa-regular fa-credit-card"></i> Thanh toán: <span class="font-semibold text-gray-700 uppercase"><?php echo $order['phuong_thuc_thanh_toan']; ?></span>
-                                </div>
-                                <div class="flex items-center gap-3">
-                                    <span class="text-sm text-gray-500">Thành tiền:</span>
-                                    <span class="text-xl font-bold text-[#9a3412]"><?php echo number_format($order['tong_tien'], 0, ',', '.'); ?>đ</span>
+
+                            <div class="mt-5 pt-4 border-t border-gray-100 flex items-center justify-between">
+                                <a href="#" class="text-sm text-[#b35d2a] font-medium hover:underline">Xem chi tiết</a>
+                                <div class="text-right">
+                                    <span class="text-sm text-gray-500 mr-2">Thành tiền:</span>
+                                    <span class="text-xl font-bold text-[#b35d2a]"><?php echo number_format($order['tong_tien'], 0, ',', '.'); ?>đ</span>
                                 </div>
                             </div>
                         </div>
-                        <?php endforeach; ?>
-                    <?php else: ?>
-                        <div class="bg-white rounded-2xl p-12 text-center border border-dashed border-gray-300">
-                            <i class="fa-solid fa-box-open text-4xl text-gray-300 mb-4"></i>
-                            <p class="text-gray-500">Chưa có đơn hàng nào.</p>
-                            <a href="../index.php" class="inline-block mt-4 text-[#9a3412] font-semibold hover:underline">Mua sắm ngay</a>
+
+                    <?php endforeach; ?>
+                <?php else: ?>
+                    <div class="bg-white rounded-2xl p-12 text-center border border-dashed border-gray-300">
+                        <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <i class="fa-solid fa-box-open text-4xl text-gray-300"></i>
                         </div>
-                    <?php endif; ?>
-                </div>
+                        <h3 class="text-lg font-bold text-gray-900">Chưa có đơn hàng nào</h3>
+                        <p class="text-gray-500 mb-6">Hãy khám phá các sản phẩm mới nhất của chúng tôi.</p>
+                        <a href="../index.php" class="px-6 py-3 bg-[#b35d2a] text-white rounded-lg font-semibold hover:bg-[#9a1902] transition text-decoration-none inline-block">
+                            Mua sắm ngay
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
+
         </div>
     </div>
 </div>
 
 <?php include('../footer.php'); ?>
 
-<!-- JAVASCRIPT HIỆU ỨNG -->
 <script>
-    // 1. Filter Orders Logic
-    function filterOrders(status) {
-        // Active Button styling
-        document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-        document.getElementById('btn-' + status).classList.add('active');
+function filterOrders(status, btn) {
+    // 1. Active nút
+    document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
 
-        const orders = document.querySelectorAll('.order-card');
-        
-        orders.forEach(order => {
-            if (status === 'all' || order.getAttribute('data-status') === status) {
-                order.style.display = 'block';
-                // Reset animation
-                order.style.animation = 'none';
-                order.offsetHeight; /* trigger reflow */
-                order.style.animation = 'slideUpFade 0.4s ease forwards';
-            } else {
-                order.style.display = 'none';
-            }
-        });
-    }
-
-    // 2. Search Logic
-    function searchOrder() {
-        const input = document.getElementById('orderSearch').value.toLowerCase();
-        const orders = document.querySelectorAll('.order-card');
-
-        orders.forEach(order => {
-            const id = order.getAttribute('data-id').toLowerCase();
-            // Check if ID contains input AND if it is currently visible (based on filter tabs)
-            // Simplified: Just search ID for now
-            if (id.includes(input)) {
-                order.style.display = 'block';
-            } else {
-                order.style.display = 'none';
-            }
-        });
-    }
-
-    // 3. Copy to Clipboard & Toast
-    function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
-            showToast(`Đã sao chép mã: ${text}`, 'success');
-        }, () => {
-            showToast('Lỗi sao chép', 'error');
-        });
-    }
-
-    function showToast(message, type = 'success') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        
-        // Style cho toast
-        const bgColor = type === 'success' ? 'bg-gray-800' : 'bg-red-500';
-        toast.className = `${bgColor} text-white px-4 py-3 rounded-lg shadow-xl flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-300 min-w-[200px]`;
-        toast.innerHTML = `
-            <i class="fa-solid ${type === 'success' ? 'fa-circle-check' : 'fa-circle-exclamation'} text-[#9a3412]"></i>
-            <span class="font-medium text-sm">${message}</span>
-        `;
-
-        container.appendChild(toast);
-
-        // Animate In
-        requestAnimationFrame(() => {
-            toast.classList.remove('translate-y-10', 'opacity-0');
-        });
-
-        // Remove after 3s
-        setTimeout(() => {
-            toast.classList.add('opacity-0', 'translate-y-5');
-            setTimeout(() => toast.remove(), 300);
-        }, 3000);
-    }
-
-    // 4. Counter Animation for Stats
-    document.addEventListener('DOMContentLoaded', () => {
-        const counters = document.querySelectorAll('.counter');
-        counters.forEach(counter => {
-            const target = +counter.getAttribute('data-target');
-            const duration = 1000; // ms
-            const increment = target / (duration / 16); // 60fps
-            
-            let current = 0;
-            const updateCounter = () => {
-                current += increment;
-                if (current < target) {
-                    counter.innerText = Math.ceil(current);
-                    requestAnimationFrame(updateCounter);
-                } else {
-                    counter.innerText = target;
-                }
-            };
-            updateCounter();
-        });
+    // 2. Lọc danh sách
+    const orders = document.querySelectorAll('.order-card');
+    orders.forEach(order => {
+        if (status === 'all' || order.dataset.status === status) {
+            order.style.display = 'block';
+            order.style.animation = 'slideUp 0.3s ease-out forwards';
+        } else {
+            order.style.display = 'none';
+        }
     });
+}
 </script>
+</body>
+</html>

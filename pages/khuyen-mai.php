@@ -4,7 +4,7 @@
   <!-- Breadcrumb -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Khuyến mãi</p>
+      <p>4P / Khuyến mãi</p>
     </div>
   </section>
 

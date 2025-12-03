@@ -5,7 +5,7 @@
   <!-- BREADCRUMB -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Bộ sưu tập / Tết 2025</p>
+      <p>4P / Bộ sưu tập / Tết 2025</p>
     </div>
   </section>
 

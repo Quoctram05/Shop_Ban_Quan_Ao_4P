@@ -3,7 +3,7 @@
   <!-- Breadcrumb -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Áo Nam</p>
+      <p>4P / Áo Nam</p>
     </div>
   </section>
 

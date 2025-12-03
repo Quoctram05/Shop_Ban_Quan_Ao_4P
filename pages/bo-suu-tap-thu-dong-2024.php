@@ -5,7 +5,7 @@
   <!-- BREADCRUMB -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Bộ Sưu Tập / Thu Đông 2024</p>
+      <p>4P / Bộ Sưu Tập / Thu Đông 2024</p>
     </div>
   </section>
 

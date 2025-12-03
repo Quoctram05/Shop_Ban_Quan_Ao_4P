@@ -29,7 +29,7 @@ $final_total = $total_amount + $shipping_fee;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thanh Toán - 4MEN Fashion</title>
+    <title>Thanh Toán - 4P Fashion</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

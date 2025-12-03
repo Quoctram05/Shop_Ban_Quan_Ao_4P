@@ -5,7 +5,7 @@
   <!-- Breadcrumb -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Áo Thun Nam</p>
+      <p>4P / Áo Thun Nam</p>
     </div>
   </section>
 

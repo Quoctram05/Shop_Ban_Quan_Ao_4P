@@ -1,10 +1,11 @@
+
 <?php include('../header.php'); ?>
 <?php include('../navbar.php'); ?>
 
   <!-- Breadcrumb -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Áo Khoác Nam</p>
+      <p>4P / Áo Khoác Nam</p>
     </div>
   </section>
 

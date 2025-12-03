@@ -9,7 +9,7 @@ $q = trim($q);
 
 <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Tìm kiếm</p>
+      <p>4P / Tìm kiếm</p>
     </div>
 </section>
 

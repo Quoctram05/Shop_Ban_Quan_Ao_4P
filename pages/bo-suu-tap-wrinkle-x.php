@@ -5,7 +5,7 @@
   <!-- Breadcrumb -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Bộ sưu tập / Wrinkle-X</p>
+      <p>4P / Bộ sưu tập / Wrinkle-X</p>
     </div>
   </section>
 

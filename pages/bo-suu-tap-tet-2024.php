@@ -4,7 +4,7 @@
   <!-- BREADCRUMB -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Bộ sưu tập / Tết 2024</p>
+      <p>4P / Bộ sưu tập / Tết 2024</p>
     </div>
   </section>
 
@@ -80,7 +80,7 @@
           <img src="../assets/img/tet6.jpg" alt="QJ090" />
           <div class="badge">-</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Quần Jeans Xanh Nhạt Thêu 4MEN QJ090</h4>
+          <h4>Quần Jeans Xanh Nhạt Thêu 4P QJ090</h4>
           <p><span class="new">545,000₫</span></p>
         </div>
 

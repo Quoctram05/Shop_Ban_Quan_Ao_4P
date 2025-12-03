@@ -8,7 +8,7 @@
 
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Áo Sơ Mi Nam</p>
+      <p>4P / Áo Sơ Mi Nam</p>
     </div>
   </section>
 

@@ -1,12 +1,17 @@
 <?php
 // (File này đã được làm sạch, không còn ký tự rác)
 // ----- KẾT NỐI CSDL BẰNG PDO -----
+// $host = "sql100.infinityfree.com";
+// $user = "if0_40585191";
+// $pass = "1254635984p"; // Sửa mật khẩu của bạn ở đây (nếu có)
+// $db   = "if0_40585191_shop_thoi_trang_hoc";
+// $charset = "utf8mb4";
+
 $host = "localhost";
 $user = "root";
 $pass = ""; // Sửa mật khẩu của bạn ở đây (nếu có)
 $db   = "shop_thoi_trang_hoc";
 $charset = "utf8mb4";
-
 // Cấu hình DSN (Data Source Name)
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 

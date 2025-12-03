@@ -4,7 +4,7 @@
   <!-- BREADCRUMB -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Bộ sưu tập / Thu Đông 2023</p>
+      <p>4P / Bộ sưu tập / Thu Đông 2023</p>
     </div>
   </section>
 
@@ -56,7 +56,7 @@
           <img src="../assets/img/td7.jpg" alt="AT136" />
           <div class="badge">-</div>
           <div class="overlay"><button>Thêm vào giỏ</button></div>
-          <h4>Áo Sweater Thêu Logo 4MEN Form Regular AS004</h4>
+          <h4>Áo Sweater Thêu Logo 4P Form Regular AS004</h4>
           <p><span class="new">325.000₫</span></p>
         </div>
 

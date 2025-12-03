@@ -3,7 +3,7 @@
 
     <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Thời trang mới nhất</p>
+      <p>4P / Thời trang mới nhất</p>
     </div>
   </section>
 

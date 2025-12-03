@@ -4,7 +4,7 @@
   <!-- Breadcrumb -->
   <section class="breadcrumb">
     <div class="container">
-      <p>4MEN / Nón Nam</p>
+      <p>4P / Nón Nam</p>
     </div>
   </section>
 
