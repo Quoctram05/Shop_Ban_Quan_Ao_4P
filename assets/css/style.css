@@ -760,10 +760,20 @@ footer {
 }
 
 /* Hiệu ứng Hover: Rê chuột vào .cart-wrapper thì hiện box */
+.cart-wrapper {
+    position: relative; /* QUAN TRỌNG: Làm điểm neo để dropdown bám vào */
+    display: inline-block; /* Giữ khối gọn gàng */
+    padding: 10px; /* Tăng diện tích để dễ hover */
+    cursor: pointer;
+}
 .cart-wrapper:hover .mini-cart-box {
     display: block;
+    animation: fadeIn 0.3s ease;
 }
-
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
 /* Header: "Có [1] Sản phẩm..." */
 .mini-cart-header {
     font-size: 14px;

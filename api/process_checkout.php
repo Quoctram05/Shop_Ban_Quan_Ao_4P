@@ -120,15 +120,21 @@ try {
 
     // === LƯU THÀNH CÔNG (COMMIT) ===
     $conn->commit();
-
-    // Xóa giỏ hàng
     unset($_SESSION['cart']);
-
-    // 5. CHUYỂN HƯỚNG TRANG
-    if ($phuong_thuc == 'cod') {
+    
+    session_write_close();
+// 5. CHUYỂN HƯỚNG TRANG (LOGIC MỚI)
+    if ($phuong_thuc == 'momo') {
+        // Chuyển sang trang giả lập MoMo
+        header("Location: ../pages/momo-gateway.php?order_id=$don_hang_id");
+    } 
+    elseif ($phuong_thuc == 'bank') {
+        // Chuyển sang trang QR Ngân hàng
+        header("Location: ../pages/cong-thanh-toan.php?order_id=$don_hang_id");
+    } 
+    else {
+        // COD (Tiền mặt)
         header("Location: ../pages/dat-hang-thanh-cong.php?id=$don_hang_id");
-    } else {
-        header("Location: ../pages/thanh-toan-qr.php?order_id=$don_hang_id");
     }
     exit();
 

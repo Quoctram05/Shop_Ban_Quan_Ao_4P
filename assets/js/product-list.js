@@ -5,7 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const paginationControls = document.getElementById('pagination-controls');
     const sortSelect = document.getElementById('sort-select');
     const filterSelect = document.getElementById('filter-type'); 
-
+    if (!productGrid) {
+        return; // Thoát khỏi hàm, không chạy tiếp
+    }
     // === 2. KHỞI TẠO TRẠNG THÁI ===
     let currentPage = 1;
     let currentSort = 'default';

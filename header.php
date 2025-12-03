@@ -22,6 +22,5 @@ $base_url = '/SHOP_BAN_QUAN_AO_4P/';
   <script defer src="<?php echo $base_url; ?>assets/js/script.js"></script>
   <script defer src="<?php echo $base_url; ?>assets/js/search.js"></script>
   <script src="<?php echo $base_url; ?>assets/js/product-list.js"></script>
-
 </head>
 <body>
