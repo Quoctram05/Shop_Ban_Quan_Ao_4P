@@ -158,9 +158,16 @@ if (!isset($page_title)) {
                     <a href="<?= $base_url ?>/admin/index.php" 
                        class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition-all <?= admin_active_if('index.php'); ?>">
                         <i class="fa-solid fa-chart-pie w-5 text-center"></i> 
-                        <span>Tổng quan</span>
+                        <span>Trang chủ</span>
                     </a>
                 </li>
+                <li>
+                    <a href="<?= $base_url ?>/admin/tong-quan.php" 
+                       class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition-all <?= admin_active_if('tong-quan.php'); ?>">
+                        <i class="fa-solid fa-tags w-5 text-center"></i> 
+                        <span>Tổng quan</span>
+                    </a>
+                </li>               
 
                 <li>
                     <a href="<?= $base_url ?>/admin/don-hang.php" 
@@ -169,7 +176,13 @@ if (!isset($page_title)) {
                         <span>Đơn hàng</span>
                     </a>
                 </li>
-
+                <li>
+                    <a href="<?= $base_url ?>/admin/danh-muc.php" 
+                       class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition-all <?= admin_active_if('danh-muc.php'); ?>">
+                        <i class="fa-solid fa-chart-pie w-5 text-center"></i> 
+                        <span>Danh mục</span>
+                    </a>
+                </li>
                 <li>
                     <a href="<?= $base_url ?>/admin/san-pham.php" 
                        class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition-all <?= admin_active_if('san-pham.php'); ?>">
@@ -178,13 +191,6 @@ if (!isset($page_title)) {
                     </a>
                 </li>
 
-                <li>
-                    <a href="<?= $base_url ?>/admin/danh-muc.php" 
-                       class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition-all <?= admin_active_if('danh-muc.php'); ?>">
-                        <i class="fa-solid fa-tags w-5 text-center"></i> 
-                        <span>Danh mục</span>
-                    </a>
-                </li>
 
                 <li>
                     <a href="<?= $base_url ?>/admin/khach-hang.php" 

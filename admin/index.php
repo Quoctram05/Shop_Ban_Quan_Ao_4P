@@ -60,7 +60,7 @@ $adminRole = $_SESSION['user_role'] ?? 'QuanTriVien';
         <!-- Header -->
         <header class="flex justify-between items-center mb-8">
             <div>
-                <h2 class="text-3xl font-bold text-gray-800">Tổng quan</h2>
+                <h2 class="text-3xl font-bold text-gray-800">Trang chủ</h2>
                 <p class="text-gray-500 mt-1">Chào mừng quay trở lại, <?php echo htmlspecialchars($adminName); ?>!</p>
             </div>
             <div class="flex items-center gap-4">
