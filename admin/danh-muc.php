@@ -176,16 +176,19 @@ function build_url($q, $type, $page, $per)
 }
 
 ?>
-<!doctype html>
-<html lang="vi">
-<head>
-    <meta charset="utf-8">
-    <link rel="icon" type="image/png" href="/Shop_Ban_Quan_Ao_4P/assets/img/logo.png">
-    <title>Quản lý danh mục</title>
-    <meta name="viewport" content="width=device-width,initial-scale=1">
-    <script src="https://cdn.tailwindcss.com"></script>
+<?php
+/* ===== HEADER ADMIN (DANH MỤC) ===== */
+$page_title = 'Quản lý Danh mục';
+$active     = 'products';
 
-    <style>
+if (file_exists(__DIR__ . '/partials/header.php')) {
+    require __DIR__ . '/partials/header.php';
+} else {
+    echo '<div class="flex min-h-screen w-full bg-slate-50">';
+}
+?>
+
+<style>
         /* Card kính (glass) cho các box thống kê + item danh mục */
         .glass {
             background: rgba(255, 255, 255, 0.96);
@@ -265,20 +268,8 @@ function build_url($q, $type, $page, $per)
             }
         }
     </style>
-</head>
-<body class="text-slate-800 font-sans">
-<div class="flex min-h-screen w-full">
-    <?php
-    // Menu bên trái (hoặc header) – nếu chưa có thì dùng placeholder
-    if (file_exists(__DIR__ . '/partials/header.php')) {
-        $active = 'products';
-        include __DIR__ . '/partials/header.php';
-    } else {
-        echo '<div class="w-64 bg-white border-r p-4 hidden md:block">Placeholder Menu</div>';
-    }
-    ?>
 
-    <main class="flex-1 w-full relative z-10 p-4 md:p-6 overflow-x-hidden">        <!-- Tiêu đề + nút thêm -->
+<main class="flex-1 w-full relative z-10 p-4 md:p-6 overflow-x-hidden">        <!-- Tiêu đề + nút thêm -->
         <div class="w-full">
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
@@ -425,7 +416,7 @@ function build_url($q, $type, $page, $per)
         <?php endif; ?>
         </div>
     </main>
-</div>
+<?php if (!file_exists(__DIR__ . '/partials/header.php')) echo '</div>'; ?>
 
 <!-- Modal Thêm / Sửa danh mục -->
 <div id="categoryModal" class="modal">
@@ -501,6 +492,8 @@ function build_url($q, $type, $page, $per)
         </form>
     </div>
 </div>
+
+
 
 <script>
     const API_URL = 'danh-muc.php';
@@ -609,5 +602,3 @@ function build_url($q, $type, $page, $per)
         if (e.target.id === 'categoryModal') closeModal();
     });
 </script>
-</body>
-</html>
