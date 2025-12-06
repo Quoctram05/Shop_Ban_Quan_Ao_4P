@@ -37,6 +37,7 @@ if (!isset($page_title)) {
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/Shop_Ban_Quan_Ao_4P/assets/img/logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($page_title); ?></title>
     
