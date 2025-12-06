@@ -72,11 +72,11 @@ try {
     $kpi['total_products'] = (int)$pdo->query($sqlProd)->fetchColumn();
 
 
-    // 3. BIỂU ĐỒ DOANH THU 7 NGÀY QUA
+    // 3. BIỂU ĐỒ DOANH THU 30 NGÀY QUA
     // Group by ngày đặt
     $sqlChart = "SELECT DATE(ngay_dat) as d, SUM(tong_tien) as total
                  FROM don_hang
-                 WHERE ngay_dat >= CURDATE() - INTERVAL 6 DAY
+                 WHERE DATE(ngay_dat) >= CURDATE() - INTERVAL 29 DAY
                  AND trang_thai != 'DaHuy'
                  GROUP BY d";
     $chartRaw = $pdo->query($sqlChart)->fetchAll(PDO::FETCH_KEY_PAIR); // [ '2025-12-01' => 500000, ... ]
@@ -84,7 +84,7 @@ try {
     $chartData = [];
     $chartLabels = [];
     // Lấp đầy các ngày không có đơn bằng số 0
-    for ($i=6; $i>=0; $i--) {
+    for ($i=29; $i>=0; $i--) {
         $date = date('Y-m-d', strtotime("-$i day"));
         $chartLabels[] = date('d/m', strtotime($date));
         $chartData[]   = (float)($chartRaw[$date] ?? 0);
@@ -181,7 +181,7 @@ if (file_exists(__DIR__ . '/partials/header.php')) {
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
-                <h3 class="font-bold text-slate-800 mb-4 text-lg">Doanh thu 7 ngày qua</h3>
+                <h3 class="font-bold text-slate-800 mb-4 text-lg">Doanh thu 30 ngày qua</h3>
                 <div class="h-[320px] w-full">
                     <canvas id="revChart"></canvas>
                 </div>

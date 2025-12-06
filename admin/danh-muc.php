@@ -113,7 +113,7 @@ if (
 // Lọc & phân trang
 $q          = trim($_GET['q'] ?? '');
 $filterType = $_GET['filter_type'] ?? 'all'; // all, root, sub
-$perPage    = max(1, (int)($_GET['per'] ?? 9));
+$perPage    = max(1, (int)($_GET['per'] ?? 8));
 $page       = max(1, (int)($_GET['page'] ?? 1));
 $offset     = ($page - 1) * $perPage;
 
@@ -244,6 +244,19 @@ function build_url($q, $type, $page, $per)
             margin-top: auto;
         }
 
+        /* Grid danh mục co giãn full chiều ngang */
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .category-grid {
+                gap: 1.25rem;
+            }
+        }
+
         @media (max-width: 768px) {
             .glass {
                 border-radius: 14px;
@@ -265,6 +278,7 @@ function build_url($q, $type, $page, $per)
     ?>
 
     <main class="flex-1 w-full relative z-10 p-4 md:p-6 overflow-x-hidden">        <!-- Tiêu đề + nút thêm -->
+        <div class="w-full">
         <div class="flex flex-col md:flex-row justify-between items-center mb-6 gap-4">
             <div>
                 <h1 class="text-3xl font-bold text-slate-800">Quản lý Danh mục</h1>
@@ -341,7 +355,7 @@ function build_url($q, $type, $page, $per)
         </div>
 
         <!-- Danh sách danh mục -->
-        <div class="grid gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div class="category-grid">
             <?php if (count($rows) == 0): ?>
                 <div class="col-span-full py-12 text-center text-slate-400">
                     Không tìm thấy danh mục nào.
@@ -408,6 +422,7 @@ function build_url($q, $type, $page, $per)
                 <?php endfor; ?>
             </div>
         <?php endif; ?>
+        </div>
     </main>
 </div>
 

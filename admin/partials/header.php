@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
 // Đặt base URL (Thư mục gốc của dự án)
@@ -30,7 +30,7 @@ function admin_active_if($file) {
 }
 
 if (!isset($page_title)) {
-    $page_title = 'Quản Trị - 4MEN Shop';
+    $page_title = 'Quản Trị - 4P Shop';
 }
 ?>
 <!DOCTYPE html>
@@ -50,7 +50,7 @@ if (!isset($page_title)) {
     
     <style>
         :root {
-            /* Tông màu 4MEN Shop */
+            /* Tông màu 4P Shop */
             --primary-color: #c72002; /* Đỏ cam */
             --primary-light: #ffeae0; /* Cam rất nhạt */
             --primary-dark: #9a1902;  /* Đỏ đậm */
@@ -139,15 +139,19 @@ if (!isset($page_title)) {
     
     <aside class="w-64 bg-white/90 backdrop-blur-lg shadow-xl flex flex-col p-4 border-r border-gray-200 z-10">
         
-        <div class="flex items-center gap-3 px-2 py-5 border-b border-gray-100 mb-4">
+        <div class="flex items-center justify-between gap-3 px-2 py-5 border-b border-gray-100 mb-4">
             <a href="<?= $base_url ?>/admin/index.php" class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-orange-500 to-red-600 flex items-center justify-center text-white shadow-lg">
                     <i class="fa-solid fa-shirt text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold text-[#c72002]">4MEN ADMIN</h1>
+                    <h1 class="text-xl font-bold text-[#c72002]">4P ADMIN</h1>
                     <p class="text-xs text-gray-500">Quản lý cửa hàng</p>
                 </div>
+            </a>
+            <a href="<?= $base_url ?>/" class="px-3 py-2 rounded-lg bg-slate-800 text-white text-sm font-semibold shadow hover:bg-slate-900 transition flex items-center gap-2">
+                <i class="fa-solid fa-house"></i>
+                <span>Shop</span>
             </a>
         </div>
         

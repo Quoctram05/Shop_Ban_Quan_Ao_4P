@@ -118,6 +118,20 @@
                         </span>
                     </div>
                 </a>
+                <?php if ($role === 'QuanTriVien'): ?>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <a href="<?php echo $base_url; ?>admin/index.php"
+                           style="display:flex;align-items:center;gap:6px;padding:8px 12px;border-radius:9999px;background:#0f172a;color:#fff;font-weight:600;white-space:nowrap;">
+                            <i class="fa-solid fa-gauge-high"></i>
+                            <span>Trang quản trị</span>
+                        </a>
+                        <a href="<?php echo $base_url; ?>logout.php"
+                           style="display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:9999px;background:#f8fafc;color:#0f172a;border:1px solid #e2e8f0;transition:all .15s ease;"
+                           onmouseover="this.style.background='#e2e8f0'" onmouseout="this.style.background='#f8fafc'">
+                            <i class="fa-solid fa-right-from-bracket"></i>
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
         <?php else: ?>
             <a href="<?php echo $base_url; ?>login.php" class="icon-btn">
