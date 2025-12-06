@@ -50,10 +50,8 @@ if (!$row) {
 
 $cartKey = $row['bien_the_id'];
 
-if (isset($_SESSION['cart'][$cartKey])) {
-    $_SESSION['cart'][$cartKey]['so_luong'] += $soLuong;
-    $_SESSION['cart'][$cartKey]['qty']      += $soLuong;
-} else {
+// Chuẩn hóa item (hỗ trợ giỏ cũ có key qty/price/name)
+if (!isset($_SESSION['cart'][$cartKey])) {
     $_SESSION['cart'][$cartKey] = [
         'bien_the_id'  => $row['bien_the_id'],
         'san_pham_id'  => $row['san_pham_id'],
@@ -61,37 +59,40 @@ if (isset($_SESSION['cart'][$cartKey])) {
         'mau_sac'      => $row['mau_sac'],
         'kich_co'      => $row['kich_co'],
         'gia_ban'      => (float)$row['gia_ban'],
-        'so_luong'     => $soLuong,
+        'so_luong'     => 0,
         'hinh_anh'     => $row['hinh_anh_dai_dien'],
         // giữ thêm field cũ để không phá api/cart.php
         'id'           => $row['bien_the_id'],
         'name'         => $row['ten_san_pham'],
         'price'        => (float)$row['gia_ban'],
         'image'        => $row['hinh_anh_dai_dien'],
-        'qty'          => $soLuong,
+        'qty'          => 0,
         'size'         => $row['kich_co'],
         'color'        => $row['mau_sac'],
     ];
 }
+
+$_SESSION['cart'][$cartKey]['so_luong'] = (int)($_SESSION['cart'][$cartKey]['so_luong'] ?? 0) + $soLuong;
+$_SESSION['cart'][$cartKey]['qty']      = (int)($_SESSION['cart'][$cartKey]['qty'] ?? 0) + $soLuong;
 
 $totalQty = 0;
 $totalPrice = 0;
 $htmlItems = '';
 
 foreach ($_SESSION['cart'] as $item) {
-    $qty = (int)$item['so_luong'];
-    $price = (float)$item['gia_ban'];
+    $qty   = isset($item['so_luong']) ? (int)$item['so_luong'] : (int)($item['qty'] ?? 0);
+    $price = isset($item['gia_ban']) ? (float)$item['gia_ban'] : (float)($item['price'] ?? 0);
     $totalQty += $qty;
     $totalPrice += $qty * $price;
 
-    $imgSrc = asset_path($item['hinh_anh'] ?? '');
+    $imgSrc = asset_path($item['hinh_anh'] ?? ($item['image'] ?? ''));
 
     $htmlItems .= '
         <div class="mini-cart-item">
-            <img src="'.htmlspecialchars($imgSrc).'" alt="'.htmlspecialchars($item['ten_san_pham']).'">
+            <img src="'.htmlspecialchars($imgSrc).'" alt="'.htmlspecialchars($item['ten_san_pham'] ?? ($item['name'] ?? 'Sản phẩm')).'">
             <div class="item-info">
-                <h4>'.htmlspecialchars($item['ten_san_pham']).'</h4>
-                <p style="font-size:12px;color:#666;margin:2px 0;">'.htmlspecialchars($item['mau_sac']).' / '.htmlspecialchars($item['kich_co']).'</p>
+                <h4>'.htmlspecialchars($item['ten_san_pham'] ?? ($item['name'] ?? 'Sản phẩm')).'</h4>
+                <p style="font-size:12px;color:#666;margin:2px 0;">'.htmlspecialchars($item['mau_sac'] ?? ($item['color'] ?? '')).(!empty($item['kich_co'] ?? $item['size'] ?? '') ? ' / ' : '').htmlspecialchars($item['kich_co'] ?? ($item['size'] ?? '')).'</p>
                 <p>'.$qty.' x <span class="price">'.format_vnd($price).'</span></p>
             </div>
         </div>

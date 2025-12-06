@@ -72,7 +72,7 @@ if (strlen($desc) > 260) {
     $desc = mb_substr($desc, 0, 260) . '...';
 }
 
-$detailLink = $baseUrl . 'pages/chi-tiet.php?slug=' . urlencode($product['slug']) . '&id=' . $product['id'];
+$detailLink = $baseUrl . 'pages/chi-tiet-san-pham.php?id=' . (int)$product['id'];
 ?>
 
 <div class="qv-inner">
