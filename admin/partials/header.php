@@ -2,7 +2,7 @@
 if (session_status() !== PHP_SESSION_ACTIVE) { session_start(); }
 
 // Đặt base URL (Thư mục gốc của dự án)
-$base_url = '/SHOP_BAN_QUAN_AO_4P';
+$base_url = '/Shop_Ban_Quan_Ao_4P';
 
 // Lấy tên file hiện tại để active menu
 $current_file = basename($_SERVER['PHP_SELF']);
@@ -37,6 +37,7 @@ if (!isset($page_title)) {
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" type="image/png" href="/Shop_Ban_Quan_Ao_4P/assets/img/logo.png">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo htmlspecialchars($page_title); ?></title>
     
@@ -197,10 +198,10 @@ if (!isset($page_title)) {
 
 
                 <li>
-                    <a href="<?= $base_url ?>/admin/khach-hang.php" 
-                       class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition-all <?= admin_active_if('khach-hang.php'); ?>">
+                    <a href="<?= $base_url ?>/admin/tai-khoan.php" 
+                       class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg transition-all <?= admin_active_if('tai-khoan.php'); ?>">
                         <i class="fa-solid fa-users w-5 text-center"></i> 
-                        <span>Khách hàng</span>
+                        <span>Tài Khoản</span>
                     </a>
                 </li>
                 

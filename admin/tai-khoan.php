@@ -6,49 +6,25 @@
 
 if (session_status() === PHP_SESSION_NONE) session_start();
 
-/* ===== 1. KẾT NỐI DATABASE ===== */
-$pdo = null;
-$dbFile = __DIR__ . '/../public/connect.php';
+/* ===== 1. KẾT NỐI DATABASE (DÙNG CHUNG connect.php) ===== */
+require_once __DIR__ . '/../public/connect.php';
 
-if (file_exists($dbFile)) {
-    require_once $dbFile;
-    if (function_exists('pdo')) {
-        $pdo = pdo();
-    } elseif (function_exists('get_pdo')) {
-        $pdo = get_pdo();
-    }
+// Chuẩn hóa biến $pdo (connect.php đang tạo $pdo và $conn)
+if (!isset($pdo) && isset($conn) && $conn instanceof PDO) {
+    $pdo = $conn;
 }
 
 if (!$pdo instanceof PDO) {
-    // Fallback kết nối nếu không load được từ file chung
-    try {
-        $pdo = new PDO(
-            'mysql:host=localhost;dbname=shop_thoi_trang_hoc;charset=utf8mb4',
-            'root',
-            '',
-            [
-                PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-            ]
-        );
-    } catch (Throwable $e) {
-        die('Lỗi kết nối database: ' . $e->getMessage());
-    }
+    die('Lỗi kết nối database: Không tạo được PDO.');
 }
 
 /* ===== 2. PHÂN QUYỀN (CHỈ QuanTriVien) ===== */
 // Lấy role theo đúng cách các file admin khác đang dùng
 $currentRole = $_SESSION['user_role'] ?? ($_SESSION['auth']['vai_tro'] ?? '');
-// Nếu không phải Quản Trị Viên -> Chặn
+
+// Nếu không phải Quản Trị Viên -> Chặn về trang login admin
 if ($currentRole !== 'QuanTriVien') {
-    http_response_code(403);
-    echo '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>Truy cập bị từ chối</title><script src="https://cdn.tailwindcss.com"></script></head>';
-    echo '<body class="bg-gray-100 h-screen flex items-center justify-center">';
-    echo '<div class="bg-white p-8 rounded-lg shadow-md text-center">';
-    echo '<h1 class="text-2xl font-bold text-red-600 mb-2">403 - Forbidden</h1>';
-    echo '<p class="text-gray-600">Bạn không có quyền truy cập trang này.</p>';
-    echo '<a href="/SHOP_BAN_QUAN_AO_4P/" class="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Về trang chủ</a>';
-    echo '</div></body></html>';
+    header('Location: /Shop_Ban_Quan_Ao_4P/login.php');
     exit;
 }
 
@@ -234,7 +210,9 @@ $rows = $stmt->fetchAll();
 $page_title = 'Quản Lý Người Dùng';
 $active     = 'accounts';
 
-if (file_exists(__DIR__ . '/partials/header.php')) {
+$hasHeader = file_exists(__DIR__ . '/partials/header.php');
+
+if ($hasHeader) {
     require_once __DIR__ . '/partials/header.php';
 } else {
     echo '<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8"><title>'.$page_title.'</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-gray-50 flex h-screen">';
@@ -301,7 +279,9 @@ if (file_exists(__DIR__ . '/partials/header.php')) {
                             <td class="px-6 py-4 text-gray-500">#<?= $r['id'] ?></td>
                             <td class="px-6 py-4">
                                 <div class="font-medium text-gray-900"><?= htmlspecialchars($r['ho_ten'] ?? 'Chưa cập nhật') ?></div>
-                                <div class="text-xs text-gray-400 mt-0.5">Ngày tạo: <?= date('d/m/Y H:i', strtotime($r['ngay_tao'])) ?></div>
+                                <div class="text-xs text-gray-400 mt-0.5">
+                                    Ngày tạo: <?= !empty($r['ngay_tao']) ? date('d/m/Y H:i', strtotime($r['ngay_tao'])) : '—' ?>
+                                </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="text-sm text-gray-700"><?= htmlspecialchars($r['email']) ?></div>
@@ -461,6 +441,9 @@ if (file_exists(__DIR__ . '/partials/header.php')) {
     });
 </script>
 
-</div>
-</body>
-</html>
+<?php
+// Nếu đang dùng fallback header (không có partials/header.php) thì đóng thẻ HTML ở đây
+if (!$hasHeader) {
+    echo '</div></body></html>';
+}
+?>

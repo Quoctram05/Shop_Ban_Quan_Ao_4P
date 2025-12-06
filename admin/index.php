@@ -40,7 +40,7 @@ if (!function_exists('money_vn')) {
 }
 
 // Cài đặt tiêu đề và menu active
-$page_title = 'Dashboard - Admin 4MEN Shop';
+$page_title = 'Trang chủ - Admin 4MEN Shop';
 $active = 'home';
 
 // Gọi Header

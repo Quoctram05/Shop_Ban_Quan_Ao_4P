@@ -7,7 +7,7 @@
 // $db   = "if0_40585191_shop_thoi_trang_hoc";
 // $charset = "utf8mb4";
 
-$host = "localhost";
+$host = "localhost"; 
 $user = "root";
 $pass = ""; // Sửa mật khẩu của bạn ở đây (nếu có)
 $db   = "shop_thoi_trang_hoc";

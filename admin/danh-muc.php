@@ -180,6 +180,7 @@ function build_url($q, $type, $page, $per)
 <html lang="vi">
 <head>
     <meta charset="utf-8">
+    <link rel="icon" type="image/png" href="/Shop_Ban_Quan_Ao_4P/assets/img/logo.png">
     <title>Quản lý danh mục</title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -346,7 +347,7 @@ function build_url($q, $type, $page, $per)
                 </button>
 
                 <?php if ($q !== '' || $filterType !== 'all'): ?>
-                    <a href="management.php"
+                    <a href="danh-muc.php"
                        class="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded-xl transition">
                         Xóa lọc
                     </a>
@@ -502,7 +503,7 @@ function build_url($q, $type, $page, $per)
 </div>
 
 <script>
-    const API_URL = 'management.php';
+    const API_URL = 'danh-muc.php';
 
     // Helper: Tạo slug từ tiếng Việt phía client
     function stringToSlug(str) {
