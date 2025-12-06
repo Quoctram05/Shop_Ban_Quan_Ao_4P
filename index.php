@@ -64,6 +64,16 @@ include('public/connect.php');
         </div>
     </div>
   </section>
+
+  <!-- Quick View Modal -->
+  <div id="quick-view-modal" class="quick-view">
+    <div class="quick-view__overlay"></div>
+    <div class="quick-view__content">
+      <button class="quick-view__close" type="button">&times;</button>
+      <div id="quick-view-body"><!-- Nội dung sẽ load bằng AJAX --></div>
+    </div>
+  </div>
+
   <?php include('footer.php'); ?>
   <script src="assets/js/home.js"></script>
 </body>

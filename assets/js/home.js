@@ -1,6 +1,14 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const ITEMS_LIMIT = 4;
+    const BASE_URL = '/Shop_Ban_Quan_Ao_4P/';
+    const QUICK_VIEW_URL = `${BASE_URL}ajax/quick-view.php`;
+    const ADD_CART_URL   = `${BASE_URL}ajax/add-to-cart.php`;
+    const quickViewModal  = document.getElementById('quick-view-modal');
+    const quickViewBody   = document.getElementById('quick-view-body');
+    const miniCartBox     = document.getElementById('mini-cart-dropdown');
+    const miniCartContent = document.querySelector('#mini-cart-dropdown .cart-content');
+    const headerCartCount = document.getElementById('header-cart-count');
 
     // Cấu hình các Bộ Sưu Tập
     const collectionsConfig = [
@@ -73,12 +81,11 @@ document.addEventListener('DOMContentLoaded', () => {
                             </a>
                             ${badgeHTML}
                             <div class="overlay">
-                                <button class="add-to-cart-btn" 
-                                    data-id="${product.id}" 
-                                    data-name="${product.ten_san_pham}" 
-                                    data-price="${displayPrice}" 
-                                    data-image="${cleanImage}">
-                                </button>
+                                <a href="#"
+                                   class="btn-cart js-open-quick-view"
+                                   data-product-id="${product.id}">
+                                   <i class="fa-solid fa-cart-shopping"></i>
+                                </a>
                             </div>
                             <h4><a href="${linkDetail}">${product.ten_san_pham}</a></h4>
                             ${priceHTML}
@@ -125,5 +132,62 @@ document.addEventListener('DOMContentLoaded', () => {
             } catch (error) { console.error(`Lỗi tải collection:`, error); }
         }
     }
+
+    // ---------- Quick View modal mở từ nút giỏ hàng đỏ ----------
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-open-quick-view');
+        if (!btn) return;
+        e.preventDefault();
+
+        const id = btn.dataset.productId;
+        if (!id) return;
+
+        fetch(`${QUICK_VIEW_URL}?id=${encodeURIComponent(id)}`)
+            .then(res => res.text())
+            .then(html => {
+                if (quickViewBody) quickViewBody.innerHTML = html;
+                if (quickViewModal) quickViewModal.classList.add('is-open');
+            })
+            .catch(err => console.error('Quick view error:', err));
+    });
+
+    // Đóng modal
+    if (quickViewModal) {
+        quickViewModal.addEventListener('click', function (e) {
+            if (e.target.classList.contains('quick-view__overlay') || e.target.classList.contains('quick-view__close')) {
+                quickViewModal.classList.remove('is-open');
+            }
+        });
+    }
+
+    // Thêm giỏ từ modal
+    document.addEventListener('click', function (e) {
+        const btn = e.target.closest('.js-add-to-cart-from-modal');
+        if (!btn) return;
+        e.preventDefault();
+
+        const form = document.getElementById('quick-view-add-cart-form');
+        if (!form) return;
+
+        const formData = new FormData(form);
+
+        fetch(ADD_CART_URL, { method: 'POST', body: formData })
+            .then(res => res.text())
+            .then(html => {
+                if (miniCartContent) {
+                    miniCartContent.innerHTML = html;
+                    const header = miniCartContent.querySelector('[data-cart-count]');
+                    if (header && headerCartCount) {
+                        headerCartCount.textContent = header.getAttribute('data-cart-count') || headerCartCount.textContent;
+                    }
+                }
+                if (miniCartBox) {
+                    miniCartBox.style.display = 'block';
+                    setTimeout(() => { miniCartBox.style.display = ''; }, 2500);
+                }
+                if (quickViewModal) quickViewModal.classList.remove('is-open');
+            })
+            .catch(err => console.error('Add to cart (modal) error:', err));
+    });
 
 });
