@@ -2,26 +2,9 @@
 // admin/management.php - Quản lý Danh mục (Tương thích CSDL shop_thoi_trang_hoc)
 session_start();
 
-// Cấu hình Database
-define('DB_HOST', 'localhost');
-define('DB_NAME', 'shop_thoi_trang_hoc');
-define('DB_USER', 'root');
-define('DB_PASS', '');
-
-try {
-    $pdo = new PDO(
-        'mysql:host=' . DB_HOST . ';dbname=' . DB_NAME . ';charset=utf8mb4',
-        DB_USER,
-        DB_PASS,
-        [
-            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-        ]
-    );
-} catch (PDOException $e) {
-    die("Lỗi kết nối CSDL: " . $e->getMessage());
-}
-
+require_once __DIR__ . '/../public/connect.php';   // dùng chung
+// alias $conn -> $pdo để giữ nguyên code cũ
+$pdo = $conn;
 // HELPER: Tạo Slug tự động từ tiếng Việt
 function create_slug($string)
 {

@@ -1,28 +1,21 @@
 <?php
 // admin/don-hang.php
 
-// 1. KẾT NỐI DATABASE (Sử dụng thông tin của shop_thoi_trang_hoc)
-// --- XÓA DÒNG include("define.php") VÌ KHÔNG CẦN THIẾT ---
+session_start();
 
-$db_host = 'localhost';
-$db_user = 'root';
-$db_pass = '';
-$db_name = 'shop_thoi_trang_hoc';
+/* ========== 1. KẾT NỐI DATABASE DÙNG CHUNG ========== */
+// Giả sử trong public/connect.php đã tạo $conn là PDO tới DB shop_thoi_trang_hoc
+require_once __DIR__ . '/../public/connect.php';
 
-try {
-    $pdo = new PDO("mysql:host={$db_host};dbname={$db_name};charset=utf8mb4", $db_user, $db_pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-    ]);
-} catch (PDOException $e) {
-    die("Lỗi kết nối CSDL: " . $e->getMessage());
-}
+/** Đổi tên biến cho dễ dùng */
+$pdo = $conn;
 
+/* ========== 2. HÀM FORMAT TIỀN ========== */
 function df($n){ return number_format((float)$n, 0, ',', '.'); }
 
-/* ====== Filters ====== */
+/* ========== 3. LẤY FILTER TỪ GET ========== */
 $q    = trim($_GET['q'] ?? '');
-$st   = trim($_GET['st'] ?? ''); 
+$st   = trim($_GET['st'] ?? '');
 $per  = max(1, (int)($_GET['per'] ?? 10));
 $page = max(1, (int)($_GET['page'] ?? 1));
 
@@ -31,7 +24,11 @@ $first = (new DateTime('first day of this month'))->format('Y-m-d');
 $d1    = $_GET['d1'] ?? $first;
 $d2    = $_GET['d2'] ?? $today;
 
-/* ====== Mapping Trạng thái hiển thị ====== */
+// Chuẩn bị giá trị cho tìm kiếm
+$qExact = ctype_digit($q) ? (int)$q : -1; // nếu q là số thì tìm theo ID, không thì gán -1
+$qLike  = '%' . $q . '%';
+
+/* ========== 4. MAP TRẠNG THÁI ========== */
 $statusMap = [
     'ChoXuLy'   => ['label' => 'Chờ xử lý',   'class' => 'bg-amber-100 text-amber-700'],
     'DaXacNhan' => ['label' => 'Đã xác nhận', 'class' => 'bg-blue-100 text-blue-700'],
@@ -40,7 +37,7 @@ $statusMap = [
     'DaHuy'     => ['label' => 'Đã hủy',      'class' => 'bg-red-100 text-red-700'],
 ];
 
-/* ====== Stats: Thống kê nhanh ====== */
+/* ========== 5. THỐNG KÊ NHANH ========== */
 $sqlToday = "SELECT COUNT(*) as so_don, COALESCE(SUM(tong_tien),0) as doanh_thu 
              FROM don_hang 
              WHERE DATE(ngay_dat) = CURDATE() AND trang_thai != 'DaHuy'";
@@ -62,63 +59,82 @@ $statBySt = $pdo->prepare("
 $statBySt->execute([':d1' => $d1, ':d2' => $d2]);
 $bySt = $statBySt->fetchAll(PDO::FETCH_KEY_PAIR);
 
-/* ====== Pagination & List ====== */
+/* ========== 6. WHERE + PARAMS CHO LIST & COUNT (DÙNG ? ĐỂ KHỎI LỆCH) ========== */
+/*
+ * THỨ TỰ DẤU HỎI:
+ * 1: ? = '' (so với q)
+ * 2: ho_ten LIKE ?
+ * 3: so_dien_thoai LIKE ?
+ * 4: d.id = ?
+ * 5: ? = '' (so với st)
+ * 6: trang_thai = ?
+ * 7: BETWEEN ? (d1)
+ * 8: AND ?     (d2)
+ */
+$where = "WHERE (? = '' OR d.ho_ten LIKE ? OR d.so_dien_thoai LIKE ? OR d.id = ?)
+          AND (? = '' OR d.trang_thai = ?)
+          AND DATE(d.ngay_dat) BETWEEN ? AND ?";
 
-// SỬA LỖI SQL Ở ĐÂY: Thay 'id' thành 'd.id' để tránh lỗi ambiguous
-$where = "WHERE (:q = '' OR ho_ten LIKE CONCAT('%',:q2,'%') OR so_dien_thoai LIKE CONCAT('%',:q2,'%') OR d.id = :q_exact)
-          AND (:st = '' OR trang_thai = :st)
-          AND DATE(ngay_dat) BETWEEN :d1 AND :d2";
+// Params chung (KHÔNG có LIMIT/OFFSET)
+$paramsFilter = [
+    $q,      // 1
+    $qLike,  // 2
+    $qLike,  // 3
+    $qExact, // 4
+    $st,     // 5
+    $st,     // 6
+    $d1,     // 7
+    $d2,     // 8
+];
 
-// Đếm tổng số đơn
-$countSql = "SELECT COUNT(*) FROM don_hang d $where"; // Thêm alias d vào đây cho chắc
-$qExact = ctype_digit($q) ? (int)$q : -1;
-
+/* ========== 7. ĐẾM TỔNG DÒNG ========== */
+$countSql = "SELECT COUNT(*) FROM don_hang d $where";
 $stmtCount = $pdo->prepare($countSql);
-$stmtCount->execute([
-    ':q' => $q, ':q2' => $q, ':q_exact' => $qExact,
-    ':st' => $st, ':d1' => $d1, ':d2' => $d2
-]);
+$stmtCount->execute($paramsFilter);
 $totalRows = (int)$stmtCount->fetchColumn();
-$pages     = max(1, (int)ceil($totalRows / $per));
-if ($page > $pages) $page = $pages;
-$offset    = ($page - 1) * $per;
 
-// Lấy danh sách đơn hàng
+$pages  = max(1, (int)ceil($totalRows / $per));
+if ($page > $pages) $page = $pages;
+$offset = ($page - 1) * $per;
+
+/* ========== 8. LẤY DANH SÁCH ĐƠN HÀNG ========== */
+/*
+ * THÊM 2 DẤU HỎI CHO LIMIT, OFFSET (vị trí 9,10)
+ */
 $sqlList = "
   SELECT d.*, 
-         COUNT(ct.id) as line_count, 
-         COALESCE(SUM(ct.so_luong), 0) as qty_sum
+         COUNT(ct.id)                AS line_count, 
+         COALESCE(SUM(ct.so_luong), 0) AS qty_sum
   FROM don_hang d
   LEFT JOIN chi_tiet_don_hang ct ON d.id = ct.don_hang_id
   $where
   GROUP BY d.id
   ORDER BY d.ngay_dat DESC
-  LIMIT :lim OFFSET :off
+  LIMIT ? OFFSET ?
 ";
 
+$paramsList = $paramsFilter; // 8 cái đầu
+$paramsList[] = (int)$per;    // 9: LIMIT
+$paramsList[] = (int)$offset; // 10: OFFSET
+
 $list = $pdo->prepare($sqlList);
-$list->bindValue(':q', $q);
-$list->bindValue(':q2', $q);
-$list->bindValue(':q_exact', $qExact, PDO::PARAM_INT);
-$list->bindValue(':st', $st);
-$list->bindValue(':d1', $d1);
-$list->bindValue(':d2', $d2);
-$list->bindValue(':lim', $per, PDO::PARAM_INT);
-$list->bindValue(':off', $offset, PDO::PARAM_INT);
-$list->execute();
+$list->execute($paramsList);
 $rows = $list->fetchAll();
 
+/* ========== 9. HELPER BUILD URL ========== */
 function build_url($arr){
   return htmlspecialchars($_SERVER['PHP_SELF']) . '?' . http_build_query($arr);
 }
-?>
 
-<?php
+/* ========== 10. HEADER ADMIN ========== */
 $page_title = 'Quản lý Đơn hàng';
 $active = 'orders';
-// Include header (nếu có file)
-if(file_exists(__DIR__ . '/partials/header.php')) require __DIR__ . '/partials/header.php';
-else echo '<div class="flex h-screen bg-slate-50">'; 
+
+if(file_exists(__DIR__ . '/partials/header.php')) {
+    require __DIR__ . '/partials/header.php';
+} else {
+    echo '<div class="flex h-screen bg-slate-50">';
+}
 ?>
 
 <style>
@@ -230,7 +246,6 @@ else echo '<div class="flex h-screen bg-slate-50">';
                  href="order_detail.php?id=<?=$o['id']?>">
                  Chi tiết
               </a>
-
             </div>
           </div>
         </div>
