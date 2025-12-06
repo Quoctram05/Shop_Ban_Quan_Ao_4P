@@ -2,68 +2,80 @@
 // admin/dashboard.php
 
 // --------------------------------------------------------------------------
-// 1. KẾT NỐI DATABASE (Cấu hình cho shop_thoi_trang_hoc)
+// 1. KHỞI ĐỘNG SESSION & KẾT NỐI CHUNG
 // --------------------------------------------------------------------------
-// 1. KHỞI ĐỘNG SESSION & KẾT NỐI
 if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+
+// luôn dùng file kết nối chung của dự án
 require_once __DIR__ . '/../public/connect.php';
 
-// 2. CHECK QUYỀN ADMIN
-$user_role = $_SESSION['user_role'] ?? '';
-if ($user_role !== 'QuanTriVien') {
-    header('Location: /SHOP_BAN_QUAN_AO_4P/login.php');
-    exit;
+/**
+ * Ở các file khác bạn đang dùng $conn (PDO) nên ở đây
+ * mình chuẩn hoá:
+ *  - Nếu $conn là PDO -> dùng lại
+ *  - Nếu $pdo đã tồn tại -> dùng tiếp
+ *  - Nếu cả hai không có -> tạo mới (fallback)
+ */
+if (isset($conn) && $conn instanceof PDO) {
+    $pdo = $conn;
 }
 
-// Cấu hình kết nối dự phòng (SỬ DỤNG THÔNG TIN CỦA BẠN)
 if (!isset($pdo) || !($pdo instanceof PDO)) {
-    // --- SỬA THÔNG TIN TẠI ĐÂY ---
-    $db_host = 'localhost';        
-    $db_user = 'root';             
-    $db_pass = '';                 
-    $db_name = 'shop_thoi_trang_hoc'; // Tên CSDL bạn cung cấp
+    // --- Fallback: chỉnh đúng thông tin localhost của bạn ---
+    $db_host = '127.0.0.1';          // dùng 127.0.0.1 thay vì localhost để tránh lỗi socket
+    $db_user = 'root';
+    $db_pass = '';
+    $db_name = 'shop_thoi_trang_hoc';
 
     try {
         $dsn = "mysql:host={$db_host};dbname={$db_name};charset=utf8mb4";
         $pdo = new PDO($dsn, $db_user, $db_pass, [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+            PDO::ATTR_ERRMODE            => PDO::ERRMODE_EXCEPTION,
             PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8mb4"
         ]);
     } catch (PDOException $e) {
         die("<div style='color:red; padding:20px; background:#ffe6e6; border:1px solid red;'>
-            <strong>LỖI KẾT NỐI:</strong> " . $e->getMessage() . "</div>");
+            <strong>LỖI KẾT NỐI:</strong> " . htmlspecialchars($e->getMessage()) . "</div>");
     }
 }
+
 // --------------------------------------------------------------------------
+// 2. CHECK QUYỀN ADMIN
+// --------------------------------------------------------------------------
+$user_role = $_SESSION['user_role'] ?? '';
+if ($user_role !== 'QuanTriVien') {
+    header('Location: /Shop_Ban_Quan_Ao_4P/login.php');
+    exit;
+}
 
 date_default_timezone_set('Asia/Ho_Chi_Minh');
 
 // Hàm định dạng tiền tệ
-function vnd($n){ return number_format($n, 0, ',', '.') . 'đ'; }
+function vnd($n) { return number_format($n, 0, ',', '.') . 'đ'; }
 
-// 2. TÍNH TOÁN KPI
+// --------------------------------------------------------------------------
+// 3. TÍNH TOÁN KPI
+// --------------------------------------------------------------------------
 $kpi = [
-    'revenue_today' => 0,
-    'orders_new'    => 0,
-    'low_stock'     => 0,
-    'total_products'=> 0
+    'revenue_today'  => 0,
+    'orders_new'     => 0,
+    'low_stock'      => 0,
+    'total_products' => 0
 ];
 
 try {
-    // KPI 1: Doanh thu hôm nay (Chỉ tính đơn đã thanh toán/hoàn thành/đang giao)
-    // Dựa trên bảng: don_hang (tong_tien, ngay_dat, trang_thai)
-    $sqlRev = "SELECT SUM(tong_tien) 
-               FROM don_hang 
-               WHERE DATE(ngay_dat) = CURDATE() 
-               AND trang_thai IN ('DaXacNhan', 'DangGiao', 'HoanThanh')";
+    // KPI 1: Doanh thu hôm nay
+    $sqlRev = "SELECT SUM(tong_tien)
+               FROM don_hang
+               WHERE DATE(ngay_dat) = CURDATE()
+                 AND trang_thai IN ('DaXacNhan', 'DangGiao', 'HoanThanh')";
     $kpi['revenue_today'] = (float)$pdo->query($sqlRev)->fetchColumn();
 
-    // KPI 2: Đơn hàng mới (Chờ xử lý)
+    // KPI 2: Đơn chờ xử lý
     $sqlNew = "SELECT COUNT(*) FROM don_hang WHERE trang_thai = 'ChoXuLy'";
     $kpi['orders_new'] = (int)$pdo->query($sqlNew)->fetchColumn();
 
-    // KPI 3: Sản phẩm sắp hết hàng (Lấy từ bảng bien_the_san_pham)
+    // KPI 3: Biến thể sắp hết hàng
     $sqlLow = "SELECT COUNT(*) FROM bien_the_san_pham WHERE so_luong_ton <= 10";
     $kpi['low_stock'] = (int)$pdo->query($sqlLow)->fetchColumn();
 
@@ -71,31 +83,33 @@ try {
     $sqlProd = "SELECT COUNT(*) FROM san_pham WHERE trang_thai = 'DangBan'";
     $kpi['total_products'] = (int)$pdo->query($sqlProd)->fetchColumn();
 
-
-    // 3. BIỂU ĐỒ DOANH THU 7 NGÀY QUA
-    // Group by ngày đặt
+    // ----------------------------------------------------------------------
+    // 4. BIỂU ĐỒ DOANH THU 7 NGÀY QUA
+    // ----------------------------------------------------------------------
     $sqlChart = "SELECT DATE(ngay_dat) as d, SUM(tong_tien) as total
                  FROM don_hang
                  WHERE ngay_dat >= CURDATE() - INTERVAL 6 DAY
-                 AND trang_thai != 'DaHuy'
+                   AND trang_thai != 'DaHuy'
                  GROUP BY d";
-    $chartRaw = $pdo->query($sqlChart)->fetchAll(PDO::FETCH_KEY_PAIR); // [ '2025-12-01' => 500000, ... ]
+    $chartRaw = $pdo->query($sqlChart)->fetchAll(PDO::FETCH_KEY_PAIR); // [ 'Y-m-d' => total ]
 
-    $chartData = [];
+    $chartData   = [];
     $chartLabels = [];
-    // Lấp đầy các ngày không có đơn bằng số 0
-    for ($i=6; $i>=0; $i--) {
+    for ($i = 6; $i >= 0; $i--) {
         $date = date('Y-m-d', strtotime("-$i day"));
         $chartLabels[] = date('d/m', strtotime($date));
         $chartData[]   = (float)($chartRaw[$date] ?? 0);
     }
 
-
-    // 4. TOP SẢN PHẨM BÁN CHẠY (Top 5)
-    // Join 3 bảng: chi_tiet_don_hang -> san_pham -> bien_the_san_pham (để lấy ảnh)
-    $sqlTop = "SELECT sp.ten_san_pham, 
-                      SUM(ct.so_luong) as da_ban,
-                      (SELECT hinh_anh_dai_dien FROM bien_the_san_pham WHERE san_pham_id = sp.id LIMIT 1) as hinh
+    // ----------------------------------------------------------------------
+    // 5. TOP SẢN PHẨM BÁN CHẠY (Top 5)
+    // ----------------------------------------------------------------------
+    $sqlTop = "SELECT sp.ten_san_pham,
+                      SUM(ct.so_luong) AS da_ban,
+                      (SELECT hinh_anh_dai_dien
+                       FROM bien_the_san_pham
+                       WHERE san_pham_id = sp.id
+                       LIMIT 1) AS hinh
                FROM chi_tiet_don_hang ct
                JOIN san_pham sp ON ct.san_pham_id = sp.id
                GROUP BY sp.id
@@ -103,9 +117,9 @@ try {
                LIMIT 5";
     $topSell = $pdo->query($sqlTop)->fetchAll();
 
-
-    // 5. DANH SÁCH SẮP HẾT HÀNG (Thay cho Hết hạn sử dụng)
-    // Lấy chi tiết biến thể (Màu, Size) sắp hết
+    // ----------------------------------------------------------------------
+    // 6. DANH SÁCH BIẾN THỂ SẮP HẾT HÀNG
+    // ----------------------------------------------------------------------
     $sqlStock = "SELECT sp.ten_san_pham, bt.mau_sac, bt.kich_co, bt.so_luong_ton, bt.sku
                  FROM bien_the_san_pham bt
                  JOIN san_pham sp ON bt.san_pham_id = sp.id
@@ -115,16 +129,18 @@ try {
     $lowStockItems = $pdo->query($sqlStock)->fetchAll();
 
 } catch (PDOException $e) {
-    die("Lỗi truy vấn dữ liệu: " . $e->getMessage());
+    die("Lỗi truy vấn dữ liệu: " . htmlspecialchars($e->getMessage()));
 }
 
+// --------------------------------------------------------------------------
+// 7. HEADER + GIAO DIỆN
+// --------------------------------------------------------------------------
 $active = 'dashboard';
-// Header include
+
 if (file_exists(__DIR__ . '/partials/header.php')) {
     include __DIR__ . '/partials/header.php';
 } else {
-    // Fallback header đơn giản nếu không có file
-    echo '<div style="background:#f1f5f9; min-height:100vh; display:flex;">'; 
+    echo '<div style="background:#f1f5f9; min-height:100vh; display:flex;">';
 }
 ?>
 
@@ -192,13 +208,12 @@ if (file_exists(__DIR__ . '/partials/header.php')) {
                     <h3 class="font-bold text-slate-800 text-lg">Kho báo động</h3>
                     <span class="text-xs font-bold bg-red-100 text-red-600 px-2 py-1 rounded">SL ≤ 10</span>
                 </div>
-                
+
                 <div class="space-y-3 max-h-[320px] overflow-y-auto pr-1 custom-scrollbar">
-                    <?php if(empty($lowStockItems)): ?>
+                    <?php if (empty($lowStockItems)): ?>
                         <div class="text-slate-400 text-sm text-center py-4">Kho hàng dồi dào!</div>
-                    <?php else: foreach($lowStockItems as $item): 
-                        $sl = (int)$item['so_luong_ton'];
-                        // Nếu hết hàng thì màu đỏ, sắp hết thì màu cam
+                    <?php else: foreach ($lowStockItems as $item):
+                        $sl        = (int)$item['so_luong_ton'];
                         $colorClass = ($sl == 0) ? 'bg-red-50 border-red-200' : 'bg-amber-50 border-amber-200';
                         $textClass  = ($sl == 0) ? 'text-red-600' : 'text-amber-600';
                     ?>
@@ -219,27 +234,25 @@ if (file_exists(__DIR__ . '/partials/header.php')) {
                     <?php endforeach; endif; ?>
                 </div>
             </div>
-            
+
             <div class="lg:col-span-3 bg-white p-5 rounded-2xl shadow-sm border border-slate-100">
                 <h3 class="font-bold text-slate-800 mb-4 text-lg">Sản phẩm bán chạy nhất</h3>
                 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-5 gap-4">
-                    <?php if(empty($topSell)): ?>
+                    <?php if (empty($topSell)): ?>
                         <div class="col-span-full text-center text-slate-400 py-4">Chưa có dữ liệu bán hàng.</div>
-                    <?php else: foreach($topSell as $idx => $t): ?>
+                    <?php else: foreach ($topSell as $idx => $t): ?>
                         <div class="flex flex-col p-3 rounded-xl border border-slate-100 hover:shadow-md transition bg-white relative">
                             <div class="absolute top-2 left-2 w-6 h-6 rounded-full bg-slate-800 text-white flex items-center justify-center text-xs font-bold shadow-md">
                                 #<?= $idx + 1 ?>
                             </div>
 
                             <div class="w-full aspect-square bg-slate-100 rounded-lg overflow-hidden mb-3">
-                                <?php 
-                                    // Xử lý đường dẫn ảnh (trong DB đang lưu dạng ../assets/img/...)
-                                    // Nếu file dashboard nằm trong admin/, thì đường dẫn này là chính xác
+                                <?php
                                     $imgSrc = !empty($t['hinh']) ? htmlspecialchars($t['hinh']) : 'https://via.placeholder.com/150?text=No+Image';
                                 ?>
                                 <img src="<?= $imgSrc ?>" class="w-full h-full object-cover hover:scale-110 transition duration-500">
                             </div>
-                            
+
                             <div class="font-medium text-slate-700 text-sm line-clamp-2 min-h-[40px] mb-1" title="<?= htmlspecialchars($t['ten_san_pham']) ?>">
                                 <?= htmlspecialchars($t['ten_san_pham']) ?>
                             </div>
@@ -260,10 +273,9 @@ if (file_exists(__DIR__ . '/partials/header.php')) {
     const data   = <?= json_encode($chartData) ?>;
 
     const ctx = document.getElementById('revChart').getContext('2d');
-    
-    // Tạo màu gradient đẹp
+
     let gradient = ctx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)'); // Màu xanh emerald nhạt
+    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
     gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
 
     new Chart(ctx, {
@@ -281,21 +293,24 @@ if (file_exists(__DIR__ . '/partials/header.php')) {
                 pointRadius: 4,
                 pointHoverRadius: 6,
                 fill: true,
-                tension: 0.35 // Độ cong của đường
+                tension: 0.35
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { 
+            plugins: {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             let label = context.dataset.label || '';
-                            if (label) { label += ': '; }
+                            if (label) label += ': ';
                             if (context.parsed.y !== null) {
-                                label += new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(context.parsed.y);
+                                label += new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
+                                    currency: 'VND'
+                                }).format(context.parsed.y);
                             }
                             return label;
                         }
@@ -308,14 +323,14 @@ if (file_exists(__DIR__ . '/partials/header.php')) {
                     grid: { borderDash: [2, 4], color: '#f1f5f9' },
                     ticks: {
                         callback: function(val) {
-                            if(val >= 1000000) return (val/1000000) + ' Tr';
-                            if(val >= 1000) return (val/1000) + ' k';
+                            if (val >= 1000000) return (val/1000000) + ' Tr';
+                            if (val >= 1000)    return (val/1000)    + ' k';
                             return val;
                         },
                         font: { size: 11, family: "'Inter', sans-serif" }
                     }
                 },
-                x: { 
+                x: {
                     grid: { display: false },
                     ticks: { font: { size: 11 } }
                 }

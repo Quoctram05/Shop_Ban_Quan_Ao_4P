@@ -8,7 +8,7 @@ require_once __DIR__ . '/../public/connect.php';
 // 2. CHECK QUYỀN ADMIN
 $user_role = $_SESSION['user_role'] ?? '';
 if ($user_role !== 'QuanTriVien') {
-    header('Location: /SHOP_BAN_QUAN_AO_4P/login.php');
+    header('Location: /Shop_Ban_Quan_Ao_4P/login.php');
     exit;
 }
 
@@ -187,7 +187,7 @@ require __DIR__ . '/partials/header.php';
             }
 
             if ($imgPath === '') {
-                $imgSrc = '/SHOP_BAN_QUAN_AO_4P/assets/img/no-image.jpg';
+                $imgSrc = '/Shop_Ban_Quan_Ao_4P/assets/img/no-image.jpg';
             } else {
                 $imgSrc = $imgPath;
             }

@@ -10,7 +10,7 @@ require_once __DIR__ . '/../public/connect.php';
 // 2. CHECK QUYỀN ADMIN
 $user_role = $_SESSION['user_role'] ?? '';
 if ($user_role !== 'QuanTriVien') {
-    header('Location: /SHOP_BAN_QUAN_AO_4P/login.php');
+    header('Location: /Shop_Ban_Quan_Ao_4P/login.php');
     exit;
 }
 
@@ -51,17 +51,17 @@ try {
     // C. Xử lý dữ liệu tổng hợp
     
     // 1. Ảnh đại diện: Ưu tiên ảnh của biến thể đầu tiên nếu sản phẩm cha không có
-    $mainImage = '/SHOP_BAN_QUAN_AO_4P/assets/img/no-image.jpg';
+    $mainImage = '/Shop_Ban_Quan_Ao_4P/assets/img/no-image.jpg';
     
     // Kiểm tra ảnh cha trước
     if (!empty($product['hinh_anh_chinh'])) {
         $imgUrl = str_replace('../', '', $product['hinh_anh_chinh']);
-        $mainImage = '/SHOP_BAN_QUAN_AO_4P/' . $imgUrl;
+        $mainImage = '/Shop_Ban_Quan_Ao_4P/' . $imgUrl;
     } 
     // Nếu không có, lấy ảnh của biến thể đầu tiên
     elseif (!empty($variants) && !empty($variants[0]['hinh_anh_dai_dien'])) {
         $imgUrl = str_replace('../', '', $variants[0]['hinh_anh_dai_dien']);
-        $mainImage = '/SHOP_BAN_QUAN_AO_4P/' . $imgUrl;
+        $mainImage = '/Shop_Ban_Quan_Ao_4P/' . $imgUrl;
     }
 
     // 2. Tính Tổng Tồn Kho & Khoảng Giá (Min - Max)
@@ -146,7 +146,7 @@ include __DIR__.'/partials/header.php';
                     <img src="<?=htmlspecialchars($mainImage)?>" 
                          alt="<?=htmlspecialchars($product['ten_san_pham'])?>" 
                          class="w-full max-h-[400px] object-contain rounded-xl"
-                         onerror="this.src='/SHOP_BAN_QUAN_AO_4P/assets/img/no-image.jpg'">
+                         onerror="this.src='/Shop_Ban_Quan_Ao_4P/assets/img/no-image.jpg'">
                 </div>
             </div>
 
@@ -233,7 +233,7 @@ include __DIR__.'/partials/header.php';
                         <tbody class="divide-y divide-gray-100">
                             <?php foreach ($variants as $v): 
                                 $imgVar = str_replace('../', '', $v['hinh_anh_dai_dien'] ?? '');
-                                $imgVarSrc = !empty($imgVar) ? '/SHOP_BAN_QUAN_AO_4P/' . $imgVar : '/SHOP_BAN_QUAN_AO_4P/assets/img/no-image.jpg';
+                                $imgVarSrc = !empty($imgVar) ? '/Shop_Ban_Quan_Ao_4P/' . $imgVar : '/Shop_Ban_Quan_Ao_4P/assets/img/no-image.jpg';
                                 $isOutOfStock = $v['so_luong_ton'] <= 0;
                                 
                                 // Màu sắc chấm tròn minh họa
