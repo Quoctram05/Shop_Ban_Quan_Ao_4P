@@ -10,7 +10,7 @@
     <nav class="nav-menu">
       <ul>
         <li><a href="<?php echo $base_url; ?>pages/thoi-trang-moi-nhat.php">HÀNG MỚI VỀ</a></li>
-
+<!-- 
         <li class="mega">
           <a href="<?php echo $base_url; ?>index.php">BỘ SƯU TẬP</a>
           <div class="mega-box">
@@ -25,7 +25,7 @@
               <a href="<?php echo $base_url; ?>pages/bo-suu-tap-thu-dong-2023.php">LOOKBACK TO FORWARD COLLECTION</a>
             </div>
           </div>
-        </li>
+        </li> -->
 
         <li class="mega">
           <a href="<?php echo $base_url; ?>pages/ao-nam.php">ÁO NAM</a>
